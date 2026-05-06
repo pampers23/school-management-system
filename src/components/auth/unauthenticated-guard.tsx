@@ -3,11 +3,11 @@ import { ReactNode } from "react";
 import { Navigate } from "react-router";
 
 function UnauthenticatedGuard({ children }: { children: ReactNode }) {
-  const { session, profile, passwordResetState, isLoading } = useSession();
+  const { session, profile, isLoading } = useSession();
 
   if (isLoading) return <div>Loading...</div>;
 
-  if (session && !passwordResetState) {
+  if (session) {
     if (profile?.role === "student") {
       return <Navigate to="/student/dashboard" />;
     }
