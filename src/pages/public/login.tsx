@@ -3,34 +3,35 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { login } from "@/actions/auth";
 
+
 const Login = () => {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
 
   const mutation = useMutation({
-    mutationFn: login,
-    onSuccess: () => {
-      navigate("/", { replace: true });
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-  });
+  mutationFn: login,
+  onSuccess: async () => {
+    navigate("/");
+  },
+  onError: (error) => {
+    console.error("LOGIN ERROR:", error);
+  },
+});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutation.mutate({ email, password });
+    mutation.mutate({ identifier, password });
   };
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       <input
-        type="email"
+        type="text"
         placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        value={identifier}
+        onChange={(e) => setIdentifier(e.target.value)}
       />
 
       <input
