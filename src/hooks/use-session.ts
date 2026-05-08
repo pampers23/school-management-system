@@ -1,76 +1,72 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
-import { getProfile } from "@/actions/action";
+import { getProfile } from "@/actions/private";
 import { Profile } from "@/types";
 
 const useSession = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const isInitializedRef = useRef(false);
+  const [sessionLoading, setSessionLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(false);
 
-  // 1. Listen to auth state
+  // SESSION LISTENER
   useEffect(() => {
-    const setupAuth = async () => {
+    const initialize = async () => {
       const { data } = await supabase.auth.getSession();
-      console.log("Initial session:", data.session);
+
       setSession(data.session);
-      isInitializedRef.current = true;
-      setIsLoading(false);
+      setSessionLoading(false);
     };
 
-    setupAuth();
+    initialize();
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        console.log("Auth state changed:", _event, session);
-        setSession(session);
-        if (isInitializedRef.current) {
-          setIsLoading(true);
-        }
-      }
-    );
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setSessionLoading(false);
+    });
 
-    return () => {
-      listener.subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
-  // 2. FETCH PROFILE ONLY WHEN SESSION EXISTS
+  // PROFILE LOADER
   useEffect(() => {
-    if (!isInitializedRef.current) {
-      console.log("Skipping profile load - still initializing");
+  const loadProfile = async () => {
+    const userId = session?.user?.id;
+
+    console.log("USER ID:", userId);
+
+    // 🚨 STOP if undefined
+    if (!userId) {
       return;
     }
 
-    const loadProfile = async () => {
-      console.log("Loading profile for session:", session?.user?.id);
-      
-      if (!session?.user?.id) {
-        console.log("No session, clearing profile");
-        setProfile(null);
-        setIsLoading(false);
-        return;
-      }
+    setProfileLoading(true);
 
-      try {
-        console.log("Fetching profile...");
-        const data = await getProfile();
-        console.log("Profile loaded:", data);
-        setProfile(data);
-      } catch (error) {
-        console.error("Failed to load profile:", error);
-        setProfile(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    try {
+      const data = await getProfile(userId);
 
-    loadProfile();
-  }, [session]);
+      console.log("PROFILE:", data);
 
-  return { session, profile, isLoading };
+      setProfile(data);
+    } catch (error) {
+      console.error("PROFILE ERROR:", error);
+      setProfile(null);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
+  loadProfile();
+}, [session]);
+
+  return {
+    session,
+    profile,
+    isLoading: sessionLoading || profileLoading,
+  };
 };
 
 export default useSession;
