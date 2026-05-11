@@ -36,8 +36,6 @@ const useSession = () => {
   const loadProfile = async () => {
     const userId = session?.user?.id;
 
-    console.log("USER ID:", userId);
-
     // 🚨 STOP if undefined
     if (!userId) {
       return;
@@ -47,8 +45,6 @@ const useSession = () => {
 
     try {
       const data = await getProfile(userId);
-
-      console.log("PROFILE:", data);
 
       setProfile(data);
     } catch (error) {
