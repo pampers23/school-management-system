@@ -36,35 +36,54 @@ export const login = async ({ identifier, password } : { identifier: string, pas
       throw new Error("Students must login using School ID");
    }
 
-   return data;
+   return { data, role:profile.role };
    }
 
+   console.log("Attempting student login with School ID:", cleanIdentifier);
+   
    //  student login using school ID
-   const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("email, role")
+   const { data: studentProfile, error: studentError } = await supabase
+      .from("student_profiles")
+      .select("profile_id")
       .eq("school_id", cleanIdentifier)
       .maybeSingle();
 
-   if (profileError || !profile) {
-      throw new Error("Invalid School ID");
+   if (studentError) {
+      console.error("student profile query error:", studentError);
+      throw new Error(`Database error: , ${studentError.message}`)
    }
+   
+   if (!studentProfile) {
+      console.warn("No student found with School ID:", cleanIdentifier);
+      throw new Error("Invalid School ID")
+   } 
 
-   if (profile.role !== "student") {
-      throw new Error("Only students can login with School ID");
+   console.log("Student profile found", studentProfile);
+   
+   const { data: profile, error: profilError } = await supabase
+      .from("profiles")
+      .select("email, role")
+      .eq("id", studentProfile.profile_id)
+      .single()
+
+   if (profilError || !profile) {
+      console.error("Profile fetch error: ", profilError);
+      throw new Error("Invalid student account")
    }
+   if (profile.role !== "student") throw new Error("Only students can login with School ID")
 
-   const { data, error } = await supabase.auth.signInWithPassword({
+   const { data, error: authError } = await supabase.auth.signInWithPassword({
       email: profile.email,
       password,
    });
 
-   if (error) throw error;
+   if (authError) throw authError;
 
-   return data;
+   return { data, role: profile.role };
   } catch (error) {
    const err = error as AuthError;
    toast.error(err.message);
+   throw error;
   }
 }
 
