@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase"
+import { CreateTeacherSchema } from "@/zod-schema";
 import { AuthError } from "@supabase/supabase-js";
 import { toast } from "sonner";
 
@@ -98,4 +99,27 @@ export async function userLogout() {
       const err = error as AuthError;
       toast.error(err.message);
    }
+}
+
+export async function createTeacher(values: CreateTeacherSchema) {
+  try {
+   const { data, error } = await supabase.functions.invoke("create-teacher", {
+    body: values,
+  });
+
+  if (error) {
+    // ✅ Extract the real error message from the response body
+    const errorBody = await (error).context?.json()
+    console.log("Real error:", errorBody)
+    throw new Error(errorBody?.error || error.message)
+  }
+
+
+  if (error) throw error;
+
+  return data;
+  } catch (error) {
+   const err = error as AuthError;
+   toast.error(err.message);
+  }
 }

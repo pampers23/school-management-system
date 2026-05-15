@@ -26,3 +26,12 @@ export type TeacherProfile = {
   department: string;
   specialization: string;
 }
+
+export type CreateTeacher = {
+  email: string;
+  password: string;
+  firstname: string;
+  lastname: string;
+  department: string;
+  specialization: string;
+}
