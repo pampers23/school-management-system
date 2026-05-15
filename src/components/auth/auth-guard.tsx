@@ -7,6 +7,7 @@ type Props = {
   allowedRoles?: string[];
 };
 
+// Updated AuthGuard component
 function AuthGuard({ children, allowedRoles }: Props) {
   const { session, profile, isLoading } = useSession();
 
@@ -17,13 +18,23 @@ function AuthGuard({ children, allowedRoles }: Props) {
   }
 
   // ensure profile exists
-   if (!profile) {
+  if (!profile) {
     return <div>Loading profile...</div>;
   }
 
-  // role check
+  // role check - redirect to appropriate dashboard instead of /unauthorized
   if (allowedRoles && !allowedRoles.includes(profile.role)) {
-    return <Navigate to="/unauthorized" />;
+    // Redirect to the correct dashboard based on role
+    switch (profile.role) {
+      case 'student':
+        return <Navigate to="/student/dashboard" replace />;
+      case 'teacher':
+        return <Navigate to="/teacher/dashboard" replace />;
+      case 'admin':
+        return <Navigate to="/" replace />;
+      default:
+        return <Navigate to="/login" replace />;
+    }
   }
 
   return <>{children}</>;

@@ -5,6 +5,14 @@ import TeacherDashboard from "@/pages/private/teacher-dashboard";
 import AdminDashboard from "@/pages/private/admin-dashboard";
 import AuthGuard from "@/components/auth/auth-guard";
 import { BrowserRouter, Route, Routes } from "react-router";
+import { AdminLayout } from "@/layouts/admin-layout";
+import Students from "@/pages/admin/students";
+import Teachers from "@/pages/admin/teachers";
+import Subjects from "@/pages/admin/subjects";
+import Schedules from "@/pages/admin/schedules";
+import Announcements from "@/pages/admin/announcements";
+import NotFound from "@/pages/not-found";
+import Unauthorized from "@/pages/unauthorized";
 
 const AppRoutes = () => {
   return (
@@ -36,13 +44,28 @@ const AppRoutes = () => {
         />
 
         <Route
-          path="/admin/dashboard"
+          path="/"
           element={
             <AuthGuard allowedRoles={["admin"]}>
-              <AdminDashboard />
+              <AdminLayout />
             </AuthGuard>
           }
-        />
+        >
+          <Route index element={<AdminDashboard />} />
+
+          <Route path="students" element={<Students />} />
+
+          <Route path="teachers" element={<Teachers />} />
+
+          <Route path="subjects" element={<Subjects />} />
+          
+          <Route path="schedules" element={<Schedules />} />
+
+          <Route path="announcements" element={<Announcements />} />
+        </Route>
+
+        <Route path="/unauthorized" element={<Unauthorized />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
