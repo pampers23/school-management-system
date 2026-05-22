@@ -22,7 +22,15 @@ export const createTeacherSchema = z.object({
   specialization: z.string().min(1, "Specialization is required"),  
 })
 
+export const createSubjectSchema = z.object({
+  subject_code: z.string().min(1, "Subject code is required"),
+  subject_name: z.string().min(1, "Subject name is required"),
+  units: z.coerce.number().min(1, "Units must be at least 1"),
+  description: z.string().optional(),
+})
+
 export type LoginSchema = z.infer<typeof loginSchema>;
 export type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>;
 export type UpdatePasswordSchema = z.infer<typeof updatePasswordSchema>;
 export type CreateTeacherSchema = z.infer<typeof createTeacherSchema>;
+export type CreateSubjectSchema = z.infer<typeof createSubjectSchema>;

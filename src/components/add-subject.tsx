@@ -9,61 +9,61 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { Controller, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import type { FormSub, Subject } from "@/types"
+import type { Subject } from "@/types"
 import { Plus } from "lucide-react"
-import { useState } from "react";
 import { toast } from "sonner"
-
-const emptyForm: FormSub = {
-  subject_code: "",
-  subject_name: "",
-  units: "",
-  description: "",
-}
+import { CreateSubjectSchema, createSubjectSchema } from "@/zod-schema"
+import { createSubject } from "@/actions/private"
+import { useMutation } from "@tanstack/react-query"
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
+import { useState } from "react"
 
 type AddSubjectProps = {
   onSubjectAdded?: (newSubject: Subject) => void;
 }
 
 export function AddSubject({ onSubjectAdded }: AddSubjectProps) {  
-  const [form, setForm] = useState<FormSub>(emptyForm);  
+  const [open, setOpen] = useState(false);
 
-  const handleCreate = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.subject_code || !form.subject_name || !form.units) {
-      toast.error("Please fill in all required fields.");
-      return;
+  const { mutate, isPending } = useMutation({
+    mutationFn: createSubject,
+    onSuccess: (data) => {          
+      onSubjectAdded?.(data as Subject);            
+      toast.success("Subject created successfully!")
+      form.reset()
+      setOpen(false)
+    },
+    onError: (error: Error) => { 
+      toast.error(error.message)
     }
-    const units = Number(form.units);
-    if (Number.isNaN(units) || units <= 0) {
-      toast.error("Units must be a positive number.");
-      return;
-    }
-    const newSubject: Subject = {
-      id: crypto.randomUUID(),
-      subject_code: form.subject_code.trim().toUpperCase(),
-      subject_name: form.subject_name.trim(),
-      units,
-      description: form.description.trim(),
-      status: "Active" as const,
-    };
-    onSubjectAdded?.(newSubject);
-    setForm(emptyForm);
-    toast.success("Subject created successfully.");
-  };  
+  })
+
+  const form = useForm<CreateSubjectSchema>({
+      resolver: zodResolver(createSubjectSchema),
+      defaultValues: {
+        subject_code: "",
+        subject_name: "",
+        units: 0,
+        description: "",
+      }
+    });
+
+  function onSubmit(values: CreateSubjectSchema) {
+      mutate(values)
+  }
 
   return (
-    <Dialog>
-      <form>
-        <DialogTrigger render={<Button
-            className="sm:self-start"
-            onClick={() => document.getElementById("subject-code")?.focus()}
-          >
-            <Plus className="mr-2 h-4 w-4" />
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger render={<Button
+        className="sm:self-start cursor-pointer"
+        onClick={() => document.getElementById("subject-code")?.focus()}
+      >
+        <Plus className="h-4 w-4" />
             Add Subject
-          </Button>} />
+      </Button>} />
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Add Subject</DialogTitle>
@@ -71,57 +71,101 @@ export function AddSubject({ onSubjectAdded }: AddSubjectProps) {
               Enter the details for the new subject.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleCreate} className="flex flex-col gap-4 mt-2">
-            <div className="flex flex-col gap-2">
-               <Label htmlFor="subject-code">Subject Code</Label> 
-               <Input 
-                  id="subject-code" 
-                  placeholder="e.g. MATH101"
-                  value={form.subject_code}
-                  onChange={(e) => setForm({ ...form, subject_code: e.target.value })}
-                />
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4 mt-2">
+            <FieldGroup>
+              <div className="flex flex-col gap-2">
+              <Controller 
+                name="subject_code"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel>Subject Code</FieldLabel>
+                    <Input 
+                      {...field}
+                      id="subject-code"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="e.g. MATH101"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}                 
+              />
             </div>
             <div className="flex flex-col gap-2">
-               <Label htmlFor="subject-name">Subject Name</Label> 
-               <Input 
-                  id="subject-name" 
-                  placeholder="e.g. Calculus I"
-                  value={form.subject_name}
-                  onChange={(e) => setForm({ ...form, subject_name: e.target.value })}
-                />
+               <Controller 
+                name="subject_name"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel>Subject Name</FieldLabel>
+                    <Input 
+                      {...field}
+                      id="subject-name"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="e.g. Calculus I"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}                 
+              />
             </div>
             <div className="flex flex-col gap-2">
-               <Label htmlFor="units">Units</Label> 
-               <Input 
-                  id="units" 
-                  type="number"
-                  min={1}
-                  placeholder="e.g. 3"
-                  value={form.units}
-                  onChange={(e) => setForm({ ...form, units: e.target.value })}
-                />
+               <Controller 
+                name="units"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel>Units</FieldLabel>
+                    <Input 
+                      {...field}
+                      id="units"
+                      aria-invalid={fieldState.invalid}
+                      type="number"
+                      min={1}
+                      placeholder="e.g. 3"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}                 
+              />
             </div>
             <div className="flex flex-col gap-2">
-               <Label htmlFor="description">Description</Label> 
-               <Input 
-                  id="description" 
-                  placeholder="e.g. Introduction to Calculus"
-                  value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
-                />
+              <Controller 
+                name="description"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel>Description</FieldLabel>
+                    <Input 
+                      {...field}
+                      id="description"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="e.g. Introduction to Calculus"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}                 
+              />
             </div>
+            </FieldGroup>
+            <DialogFooter>
+              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                <DialogClose render={<Button variant="outline">Cancel</Button>} />
+                <Button type="submit" disabled={isPending} className="w-full gap-2 cursor-pointer">
+                  {isPending ? "Creating..." : "Create Subject"}
+                </Button>
+              </div>
+            </DialogFooter>
           </form>
-          <DialogFooter>
-            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-              <Button type="button" variant="outline" onClick={() => setForm(emptyForm)}>
-                Clear Form
-              </Button>
-              <DialogClose render={<Button variant="outline">Cancel</Button>} />
-              <Button type="submit">Save changes</Button>
-            </div>
-          </DialogFooter>
         </DialogContent>
-      </form>
     </Dialog>
   )
 }
