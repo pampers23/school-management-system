@@ -2,13 +2,13 @@ import { createTeacherSchema, CreateTeacherSchema } from "@/zod-schema"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
-import { createTeacher } from "@/actions/auth"
+import { createTeacher } from "@/actions/private"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { FieldError, FieldGroup } from "@/components/ui/field"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { toast } from "sonner" // ✅ add this
+import { toast } from "sonner"
 
 const Teachers = () => {
   const { mutate, isPending } = useMutation({
@@ -35,7 +35,7 @@ const Teachers = () => {
   });
 
   function onSubmit(values: CreateTeacherSchema) {
-    mutate(values) // ✅ no need to spread, just pass directly
+    mutate(values)
   }
   
   return (
@@ -44,7 +44,7 @@ const Teachers = () => {
         <CardTitle>Create Teacher Account</CardTitle>
       </CardHeader>
 
-      <form onSubmit={form.handleSubmit(onSubmit)}> {/* ✅ form wraps both */}
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <CardContent>
           <FieldGroup>
             <Controller
@@ -109,7 +109,7 @@ const Teachers = () => {
                   <FieldLabel>Password</FieldLabel>
                   <Input
                     {...field}
-                    type="password" // ✅ mask the password
+                    type="password"
                     aria-invalid={fieldState.invalid}
                     placeholder="Enter password"
                   />
@@ -158,8 +158,8 @@ const Teachers = () => {
           </FieldGroup>
         </CardContent>
 
-        <CardFooter> {/* ✅ moved outside CardContent */}
-          <Button type="submit" disabled={isPending} className="w-full gap-2">
+        <CardFooter>
+          <Button type="submit" disabled={isPending} className="w-full gap-2 cursor-pointer">
             {isPending ? "Creating..." : "Create Teacher"}
           </Button>
         </CardFooter>

@@ -13,6 +13,7 @@ import Schedules from "@/pages/admin/schedules";
 import Announcements from "@/pages/admin/announcements";
 import NotFound from "@/pages/not-found";
 import Unauthorized from "@/pages/unauthorized";
+import Curriculum from "@/pages/admin/curriculum";
 
 const AppRoutes = () => {
   return (
@@ -58,9 +59,11 @@ const AppRoutes = () => {
           <Route path="teachers" element={<Teachers />} />
 
           <Route path="subjects" element={<Subjects />} />
-          
-          <Route path="schedules" element={<Schedules />} />
 
+          <Route path="curriculum" element={<Curriculum />} />
+
+          <Route path="schedules" element={<Schedules />} />
+    
           <Route path="announcements" element={<Announcements />} />
         </Route>
 

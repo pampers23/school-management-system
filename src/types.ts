@@ -36,7 +36,7 @@ export type CreateTeacher = {
   specialization: string;
 }
 
-export type SubjectStatus = "All" | "Active" | "Archived";
+export type SubjectStatus = "Active" | "Archived";
 
 export type Subject = {
   id: string;
@@ -48,6 +48,13 @@ export type Subject = {
 }
 
 export type FormSub = {
+  subject_code: string;
+  subject_name: string;
+  units: string;
+  description: string;
+}
+
+export type CreateSubject = {
   subject_code: string;
   subject_name: string;
   units: string;

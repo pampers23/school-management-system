@@ -41,14 +41,26 @@ const data = {
       icon: GraduationCap,
     },
     {
-      title: "Subjects",
-      url: "/subjects",
+      title: "Academics",
+      url: "/academics",
       icon: BookOpen,
-    },
-    {
-      title: "Schedules",
-      url: "/schedules",
-      icon: CalendarDays,
+      isActive: true,
+      items: [
+        {
+          title: "Curriculum",
+          url: "/curriculum"
+        },
+        {
+          title: "Subjects",
+          url: "/subjects",
+          icon: CalendarDays,
+        },
+        {
+          title: "Schedules",
+          url: "/schedules",
+          icon: CalendarDays,
+        },
+      ]
     },
     {
       title: "Announcements",

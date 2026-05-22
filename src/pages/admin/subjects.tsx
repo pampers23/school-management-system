@@ -56,15 +56,17 @@ import { cn } from "@/lib/utils";
 import { AddSubject } from "@/components/add-subject";
 import StatCard from "@/components/stat-card";
 import type { Subject, SubjectStatus } from "@/types";
-import subjectsData from "@/data/subjects.json";
 import {
   IconChevronsLeft,
   IconChevronsRight,
   IconChevronLeft,
   IconChevronRight,
 } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
+import { getSubjectList } from "@/actions/private";
+import { Tailspin } from "ldrs/react";
 
-// ─── Column Definitions ───────────────────────────────────────────────────────
+
 
 const buildColumns = (
   toggleArchive: (id: string) => void
@@ -196,14 +198,33 @@ const buildColumns = (
   },
 ];
 
-const Subjects = () => {
-  const [subjects, setSubjects] = useState<Subject[]>(
-    subjectsData as Subject[]
-  );
+function SubjectList() {
+  const { data, isPending } = useQuery({
+    queryKey: ["subjects"],
+    queryFn: getSubjectList
+  })
+  
+  if (isPending) {
+    return (
+      <div className="h-96 w-full flex flex-col gap-4 items-center justify-center my-7 md:my-14">
+        <p className="text-sm text-muted-foreground animate-pulse">Fetching subjects...</p>
+        <Tailspin size="30" stroke="3" speed="0.9" color="#262E40" />
+      </div>
+    );
+  }
 
+  if (!data?.subjectsList || data.subjectsList.length === 0) {
+    return <NoSubjectsList />
+  }
+  return <SubjectsListTable subjectsList={data.subjectsList} />
+
+}
+
+function SubjectsListTable({ subjectsList: initialSubjects }: { subjectsList: Subject[] }) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-
+  const [subjects, setSubjects] = useState<Subject[]>(initialSubjects);
+  
   // Stable toggle so buildColumns doesn't re-run on every render
   const toggleArchive = useCallback((id: string) => {
     setSubjects((prev) =>
@@ -459,4 +480,19 @@ const Subjects = () => {
   );
 };
 
-export default Subjects;
+
+function NoSubjectsList() {
+  return (
+    <div className="rounded-md border bg-muted overflow-hidden w-full h-96 flex flex-col items-center justify-center gap-3 my-7 md:my-14 text-center px-4">
+      <h2 className="text-lg font-semibold">No subjects to show</h2>
+      <p className="text-sm text-muted-foreground max-w-md">
+        You haven’t added any subjects records yet. Start by adding a subject to see its information here.
+      </p>
+      <div className="w-full sm:w-auto">
+        <AddSubject onSubjectAdded={() => toast.success("Subject added!")} />
+      </div>
+    </div>
+  );
+}
+
+export default SubjectList;
