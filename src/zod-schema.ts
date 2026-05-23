@@ -25,7 +25,7 @@ export const createTeacherSchema = z.object({
 export const createSubjectSchema = z.object({
   subject_code: z.string().min(1, "Subject code is required"),
   subject_name: z.string().min(1, "Subject name is required"),
-  units: z.coerce.number().min(1, "Units must be at least 1"),
+  units: z.number().min(1, "Units must be at least 1").max(12, "Maximum 12 units"),
   description: z.string().optional(),
 })
 

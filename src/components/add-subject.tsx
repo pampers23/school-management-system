@@ -113,28 +113,29 @@ export function AddSubject({ onSubjectAdded }: AddSubjectProps) {
                 )}                 
               />
             </div>
-            <div className="flex flex-col gap-2">
-               <Controller 
-                name="units"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>Units</FieldLabel>
-                    <Input 
-                      {...field}
-                      id="units"
-                      aria-invalid={fieldState.invalid}
-                      type="number"
-                      min={1}
-                      placeholder="e.g. 3"
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}                 
-              />
-            </div>
+              <div className="flex flex-col gap-2">
+                <Controller 
+                  name="units"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel>Units</FieldLabel>
+                      <Input 
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                        id="units"
+                        aria-invalid={fieldState.invalid}
+                        type="number"
+                        min={1}
+                        placeholder="e.g. 3"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}                 
+                />
+              </div>
             <div className="flex flex-col gap-2">
               <Controller 
                 name="description"
