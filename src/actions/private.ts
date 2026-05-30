@@ -101,3 +101,41 @@ export const getSubjectList = async () => {
     toast.error(err.message);
   }
 }
+
+export const addCurriculum = async (curriculum: { course: string; year_level: string; semester: string, strand?: string }) => {
+  try {
+    const { data, error } = await supabase
+      .from("curriculums")
+      .insert([curriculum])
+      .select()
+      .single()
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data; 
+  } catch (error) {
+    const err = error as AuthError;
+    toast.error(err.message);
+  }
+}
+
+export const getCurriculum = async () => {
+  try {
+    const { data, error } = await supabase
+      .from("curriculums")
+      .select("*")
+      .order("created_at", { ascending: false })
+      
+    if (error) {
+      throw new Error(error.message);
+      return { curriculumList: [] };
+    }
+
+    return { curriculumList: data ?? [] };   
+  } catch (error) {
+    const err = error as AuthError;
+    toast.error(err.message);
+  }
+}

@@ -1,3 +1,5 @@
+import { COURSES, YEAR_LEVELS, SEMESTERS, STRAND } from "@/data";
+
 export type Profile = {
   id: string;
   email: string;
@@ -60,3 +62,33 @@ export type CreateSubject = {
   units: string;
   description: string;
 }
+
+export type SubjectRef = {
+  id: string;
+  subject_code: string;
+  subject_name: string;
+  units: number;
+}
+
+export type Curriculum = {
+  id: string;
+  course: Course;
+  year_level: YearLevel;
+  semester: Semester;
+  subject_id: string[];
+}
+
+export type FormState = {
+  course: Course | "";
+  year_level: YearLevel | "";
+  semester: Semester | "";
+  strand: Strand | "";
+}
+
+export type Strand = (typeof STRAND)[number];
+
+export type Course = (typeof COURSES)[number];
+
+export type YearLevel = (typeof YEAR_LEVELS)[number];
+
+export type Semester = (typeof SEMESTERS)[number];
