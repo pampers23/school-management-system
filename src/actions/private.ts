@@ -125,15 +125,22 @@ export const getCurriculum = async () => {
   try {
     const { data, error } = await supabase
       .from("curriculums")
-      .select("*")
-      .order("created_at", { ascending: false })
-      
-    if (error) {
-      throw new Error(error.message);
-      return { curriculumList: [] };
-    }
+      .select(`
+        *,
+        curriculum_subjects (
+          subject_id
+        )
+      `)
+      .order("created_at", { ascending: false });
 
-    return { curriculumList: data ?? [] };   
+    if (error) throw new Error(error.message);
+
+    const curriculumList = (data ?? []).map((c) => ({
+      ...c,
+      subject_id: c.curriculum_subjects.map((cs: { subject_id: string }) => cs.subject_id),
+    }));
+
+    return { curriculumList };
   } catch (error) {
     const err = error as AuthError;
     toast.error(err.message);
@@ -197,18 +204,24 @@ export const getCurriculumSubjects = async (curriculum_id: string) => {
     toast.error(err.message);
   }
 }
-export const removeSubjectFromCurriculum = async (id: string) => {
+export const removeCurriculum = async (id: string) => {
   try {
-    const { data, error } = await supabase
+    // delete junction rows first
+    const { error: subjectsError } = await supabase
       .from("curriculum_subjects")
+      .delete()
+      .eq("curriculum_id", id);
+
+    if (subjectsError) throw new Error(subjectsError.message);
+
+    // then delete the curriculum itself
+    const { error } = await supabase
+      .from("curriculums")
       .delete()
       .eq("id", id);
 
-    if (error) {
-      throw new Error(error.message);
-    }
+    if (error) throw new Error(error.message);
 
-    return data;
   } catch (error) {
     const err = error as AuthError;
     toast.error(err.message);

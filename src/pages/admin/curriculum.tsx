@@ -20,7 +20,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import StatCard from "@/components/stat-card";
 import AddCurriculum from "@/components/add-curriculum";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getCurriculum, getCurriculumSubjects, getSubjects, removeSubjectFromCurriculum, syncCurriculumSubjects, updateCurriculumSubject } from "@/actions/private";
+import { getCurriculum, getCurriculumSubjects, getSubjects, removeCurriculum, syncCurriculumSubjects, updateCurriculumSubject } from "@/actions/private";
 import { Tailspin } from "ldrs/react";
 import { COURSES, YEAR_LEVELS, SEMESTERS, STRAND } from "@/data";
 import type { Curriculum, FormState, Course, YearLevel, Semester, Subject, Strand } from "@/types";
@@ -111,7 +111,7 @@ function CurriculumListTable({ curriculumList, onCurriculumAdded }: CurriculumLi
   });
 
   const { mutate } = useMutation({
-    mutationFn: (id: string) => removeSubjectFromCurriculum(id),
+    mutationFn: (id: string) => removeCurriculum(id),
     onSuccess: (_, id) => {
       setCurricula((prev) => prev.filter((c) => c.id !== id));
       toast.success("Curriculum deleted");
