@@ -72,7 +72,8 @@ export type SubjectRef = {
 
 export type Curriculum = {
   id: string;
-  course: Course;
+  strand?: Strand;
+  course?: Course;
   year_level: YearLevel;
   semester: Semester;
   subject_id: string[];
