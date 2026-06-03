@@ -139,3 +139,131 @@ export const getCurriculum = async () => {
     toast.error(err.message);
   }
 }
+
+export const getSubjects = async () => {
+  try {
+    const { data, error } = await supabase
+      .from("subjects")
+      .select("*")
+      .order("subject_code", { ascending: true })
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data ?? []  
+  } catch (error) {
+    const err = error as AuthError;
+    toast.error(err.message);
+    return [];
+  }
+}
+
+export const assignSubjectToCurriculum = async () => {
+  try {
+    const { data, error } = await supabase
+      .from("curriculum_subjects")
+      .insert("curriculum_id, subject_id")
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  } catch (error) {
+    const err = error as AuthError;
+    toast.error(err.message);
+  }
+}
+
+export const getCurriculumSubjects = async (curriculum_id: string) => {
+  try {
+    const { data, error } = await supabase
+      .from("curriculum_subjects")
+      .select(`*,
+        subjects (
+          id, subject_code, subject_name, units, status
+        )
+      `)
+      .eq("curriculum_id", curriculum_id);
+
+    if (error) throw new Error(error.message);
+
+    return data;
+  } catch (error) {
+    const err = error as AuthError;
+    toast.error(err.message);
+  }
+}
+export const removeSubjectFromCurriculum = async (id: string) => {
+  try {
+    const { data, error } = await supabase
+      .from("curriculum_subjects")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  } catch (error) {
+    const err = error as AuthError;
+    toast.error(err.message);
+  }
+}
+
+export const updateCurriculumSubject = async (
+  id: string,
+  form: { course: string; year_level: string; semester: string; strand: string },
+) => {
+  try {
+    const { data, error } = await supabase
+      .from("curriculums")
+      .update({
+        course: form.course,
+        year_level: form.year_level,
+        semester: form.semester,
+        strand: form.strand,
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  } catch (error) {
+    const err = error as AuthError;
+    toast.error(err.message);
+  }
+}
+
+
+export const syncCurriculumSubjects = async (curriculum_id: string, subject_ids: string[]) => {
+  try {
+    // delete existing
+    const { error: deleteError } = await supabase
+      .from("curriculum_subjects")
+      .delete()
+      .eq("curriculum_id", curriculum_id);
+
+    if (deleteError) throw new Error(deleteError.message);
+
+    // insert new
+    if (subject_ids.length > 0) {
+      const { error: insertError } = await supabase
+        .from("curriculum_subjects")
+        .insert(subject_ids.map((subject_id) => ({ curriculum_id, subject_id })));
+
+      if (insertError) throw new Error(insertError.message);
+    }
+  } catch (error) {
+    const err = error as AuthError;
+    toast.error(err.message);
+  }
+}

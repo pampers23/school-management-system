@@ -43,6 +43,7 @@ const AddCurriculum = ({ onCurriculumAdded }: AddCurriculumProp) => {
         course: data.course as Course,
         year_level: data.year_level as YearLevel,
         semester: data.semester as Semester,
+        strand: data.strand ?? undefined,
         subject_id: [],
       };
       setCurricula((prev) => [newCurriculum, ...prev]);
@@ -85,6 +86,7 @@ const AddCurriculum = ({ onCurriculumAdded }: AddCurriculumProp) => {
       course: form.course as Course,
       year_level: form.year_level as YearLevel,
       semester: form.semester as Semester,
+      strand: form.strand || undefined,
       subject_id: [],
     };
     setCurricula((prev) => [optimisticCurriculum, ...prev]);
