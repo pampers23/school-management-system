@@ -14,6 +14,7 @@ import Announcements from "@/pages/admin/announcements";
 import NotFound from "@/pages/not-found";
 import Unauthorized from "@/pages/unauthorized";
 import Curriculum from "@/pages/admin/curriculum";
+import Sections from "@/pages/admin/sections";
 
 const AppRoutes = () => {
   return (
@@ -65,6 +66,8 @@ const AppRoutes = () => {
           <Route path="schedules" element={<Schedules />} />
     
           <Route path="announcements" element={<Announcements />} />
+
+          <Route path="sections" element={<Sections />} />
         </Route>
 
         <Route path="/unauthorized" element={<Unauthorized />} />

@@ -79,7 +79,7 @@ export type Curriculum = {
   subject_id: string[];
 }
 
-export type FormState = {
+export type FormCurriculum = {
   course: Course | "";
   year_level: YearLevel | "";
   semester: Semester | "";
@@ -93,3 +93,19 @@ export type Course = (typeof COURSES)[number];
 export type YearLevel = (typeof YEAR_LEVELS)[number];
 
 export type Semester = (typeof SEMESTERS)[number];
+
+export type Section = {
+  id: string;
+  name: string;
+  course: Course;
+  year_level: YearLevel;
+  maxStudents: number;
+  archived: boolean;
+}
+
+export type FormSection = {
+  name: string;
+  course: Course | "";
+  year_level: YearLevel | "";
+  maxStudents: number;
+}

@@ -3,7 +3,6 @@
 import * as React from "react"
 import {
   BookOpen,
-  CalendarDays,
   GraduationCap,
   LayoutDashboard,
   Megaphone,
@@ -53,13 +52,15 @@ const data = {
         {
           title: "Subjects",
           url: "/subjects",
-          icon: CalendarDays,
         },
         {
           title: "Schedules",
           url: "/schedules",
-          icon: CalendarDays,
         },
+        {
+          title: "Sections",
+          url: "/sections",
+        }
       ]
     },
     {
