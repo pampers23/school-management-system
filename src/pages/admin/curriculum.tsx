@@ -23,21 +23,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCurriculum, getCurriculumSubjects, getSubjects, removeCurriculum, syncCurriculumSubjects, updateCurriculumSubject } from "@/actions/private";
 import { Tailspin } from "ldrs/react";
 import { COURSES, YEAR_LEVELS, SEMESTERS, STRAND } from "@/data";
-import type { Curriculum, FormState, Course, YearLevel, Semester, Subject, Strand } from "@/types";
+import type { Curriculum, FormCurriculum, Course, YearLevel, Semester, Subject, Strand } from "@/types";
+import { getLevelType } from "@/lib/education";
 
+const emptyForm: FormCurriculum = { course: "", year_level: "", semester: "", strand: "" };
 
-const emptyForm: FormState = { course: "", year_level: "", semester: "", strand: "" };
-
-// ─── Utility ─────────────────────────────────────────────────────────────────
-
-function getLevelType(yearLevel: string): "basic" | "senior" | "college" {
-  if ([
-    "Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5",
-    "Grade 6", "Grade 7", "Grade 8", "Grade 9", "Grade 10",
-  ].includes(yearLevel)) return "basic";
-  if (["Grade 11", "Grade 12"].includes(yearLevel)) return "senior";
-  return "college";
-}
 
 // ─── NoCurriculumList ────────────────────────────────────────────────────────
 
@@ -99,7 +89,7 @@ function CurriculumListTable({ curriculumList, onCurriculumAdded }: CurriculumLi
   const [curricula, setCurricula] = useState<Curriculum[]>(curriculumList);
   const [courseFilter, setCourseFilter] = useState<"all" | Course>("all");
   const [editTarget, setEditTarget] = useState<Curriculum | null>(null);
-  const [editForm, setEditForm] = useState<FormState>(emptyForm);
+  const [editForm, setEditForm] = useState<FormCurriculum>(emptyForm);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
@@ -122,7 +112,7 @@ function CurriculumListTable({ curriculumList, onCurriculumAdded }: CurriculumLi
   });
 
   const { mutate: editCurriculum } = useMutation({
-    mutationFn: async (payload: { id: string; form: FormState; subject_ids: string[] }) => {
+    mutationFn: async (payload: { id: string; form: FormCurriculum; subject_ids: string[] }) => {
       await updateCurriculumSubject(payload.id, payload.form);
       await syncCurriculumSubjects(payload.id, payload.subject_ids);
     },

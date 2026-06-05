@@ -9,7 +9,7 @@ import { toast } from "sonner"
 import { COURSES, SEMESTERS, STRAND, YEAR_LEVELS } from "@/data"
 import { useMutation } from "@tanstack/react-query"
 import { addCurriculum } from "@/actions/private"
-import type { Course, Curriculum, FormState, Semester, Strand, YearLevel } from "@/types"
+import type { Course, Curriculum, FormCurriculum, Semester, Strand, YearLevel } from "@/types"
 
 type AddCurriculumProp = {
   onCurriculumAdded?: () => void;
@@ -19,11 +19,11 @@ type AddCurriculumProp = {
 const SHS = ["Grade 11", "Grade 12"] as const;
 const COLLEGE = ["1st Year", "2nd Year", "3rd Year", "4th Year"] as const;
 
-const emptyForm: FormState = { course: "", year_level: "", semester: "", strand: "" };
+const emptyForm: FormCurriculum = { course: "", year_level: "", semester: "", strand: "" };
 
 const AddCurriculum = ({ onCurriculumAdded }: AddCurriculumProp) => {
   const [curricula, setCurricula] = useState<Curriculum[]>([]);
-  const [form, setForm] = useState<FormState>(emptyForm);
+  const [form, setForm] = useState<FormCurriculum>(emptyForm);
   const [createOpen, setCreateOpen] = useState(false);
 
   // Derived booleans based on selected year level

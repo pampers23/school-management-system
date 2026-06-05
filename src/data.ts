@@ -9,3 +9,18 @@ export const YEAR_LEVELS = [
 export const SEMESTERS = ["1st Semester", "2nd Semester"] as const;
 
 export const STRAND = ["TVL/ICT", "HUMSS", "ABM", "STEM"] as const ;
+
+export function useAcademics() {
+  return {
+    sections: [],
+    addSection: (_: unknown) => { void _; },
+    updateSection: (_id: string, _data: unknown) => { void _id; void _data; },
+    archiveSection: (_id: string) => { void _id; },
+  } as const;
+}
+
+export function enrolledCount(_st: unknown, _sectionId: string) {
+  void _st;
+  void _sectionId;
+  return 0;
+}
