@@ -99,7 +99,7 @@ export type Section = {
   name: string;
   course: Course;
   year_level: YearLevel;
-  maxStudents: number;
+  max_students: number;
   archived: boolean;
 }
 
@@ -107,5 +107,5 @@ export type FormSection = {
   name: string;
   course: Course | "";
   year_level: YearLevel | "";
-  maxStudents: number;
+  max_students: number;
 }

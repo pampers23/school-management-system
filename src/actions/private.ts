@@ -281,7 +281,7 @@ export const syncCurriculumSubjects = async (curriculum_id: string, subject_ids:
   }
 }
 
-export const createSection = async (section: { name: string; course: string; year_level: string; maxStudents: number }) => {
+export const createSection = async (section: { name: string; course: string; year_level: string; max_students: number }) => {
   try {
     const { data, error } = await supabase
       .from("sections")
@@ -289,7 +289,7 @@ export const createSection = async (section: { name: string; course: string; yea
         name: section.name,
         course: section.course,
         year_level: parseInt(section.year_level),
-        max_students: section.maxStudents,
+        max_students: section.max_students,
       })
       .select()
       .single();
@@ -311,6 +311,7 @@ export const getSection = async () => {
     const { data, error } = await supabase
       .from("sections")
       .select("*")
+      .eq("active", true)
       .order("created_at",{ ascending: false });
 
     if (error) {
@@ -324,12 +325,36 @@ export const getSection = async () => {
   }
 }
 
-export const updateSection = async (section_id: string) => {
+export const archiveSection = async (id: string) => {
   try {
     const { data, error } = await supabase
       .from("sections")
-      .update("name, course, year_level, max_students")
-      .eq("id", section_id)
+      .update({ active: false })
+      .eq("id", id)
+      
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  } catch (error) {
+    const err = error as AuthError;
+    toast.error(err.message);
+  }
+};
+
+export const updateSection = async (id: string, section: { name: string; course: string; year_level: string; max_students: number }) => {
+  try {
+    const { data, error } = await supabase
+      .from("sections")
+      .update({
+        name: section.name,
+        course: section.course,
+        year_level: parseInt(section.year_level),
+        max_students: section.max_students,
+      })
+      .eq("id", id)
       .select()
       .single();
 
@@ -342,4 +367,4 @@ export const updateSection = async (section_id: string) => {
     const err = error as AuthError;
     toast.error(err.message);
   }
-}
+};
