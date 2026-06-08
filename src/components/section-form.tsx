@@ -100,6 +100,7 @@ export const SectionForm = ({ title, onSubmit, submitLabel, form: controlledForm
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               placeholder="Ex: BSIT-1A"
+              className="p-5"
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -108,10 +109,10 @@ export const SectionForm = ({ title, onSubmit, submitLabel, form: controlledForm
               value={form.course}
               onValueChange={(v) => setForm({ ...form, course: v as Course })}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full p-5">
                 <SelectValue placeholder="Select Course" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent alignItemWithTrigger={false} className="p-3">
                 {COURSES.map((c) => (
                   <SelectItem key={c} value={c}>
                     {c}
@@ -126,10 +127,10 @@ export const SectionForm = ({ title, onSubmit, submitLabel, form: controlledForm
               value={form.year_level}
               onValueChange={(v) => setForm({ ...form, year_level: v as YearLevel })}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full p-5">
                 <SelectValue placeholder="Select year level" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent alignItemWithTrigger={false} className="p-3">
                 {YEAR_LEVELS.map((y) => (
                   <SelectItem key={y} value={y}>
                     {y}
@@ -145,6 +146,7 @@ export const SectionForm = ({ title, onSubmit, submitLabel, form: controlledForm
               min={1}
               value={form.maxStudents}
               onChange={(e) => setForm({ ...form, maxStudents: Number(e.target.value) })}
+              className="w-full p-5"
             />
           </div>
           <DialogFooter>
