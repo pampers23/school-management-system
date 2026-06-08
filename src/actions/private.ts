@@ -280,3 +280,66 @@ export const syncCurriculumSubjects = async (curriculum_id: string, subject_ids:
     toast.error(err.message);
   }
 }
+
+export const createSection = async (section: { name: string; course: string; year_level: string; maxStudents: number }) => {
+  try {
+    const { data, error } = await supabase
+      .from("sections")
+      .insert({
+        name: section.name,
+        course: section.course,
+        year_level: parseInt(section.year_level),
+        max_students: section.maxStudents,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  } catch (error) {
+    const err = error as AuthError;
+    toast.error(err.message);
+  }
+}
+
+
+export const getSection = async () => {
+  try {
+    const { data, error } = await supabase
+      .from("sections")
+      .select("*")
+      .order("created_at",{ ascending: false });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  } catch (error) {
+    const err = error as AuthError;
+    toast.error(err.message);
+  }
+}
+
+export const updateSection = async (section_id: string) => {
+  try {
+    const { data, error } = await supabase
+      .from("sections")
+      .update("name, course, year_level, max_students")
+      .eq("id", section_id)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  } catch (error) {
+    const err = error as AuthError;
+    toast.error(err.message);
+  }
+}

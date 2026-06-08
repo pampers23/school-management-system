@@ -15,6 +15,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { type FormEvent, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { createSection } from "@/actions/private";
+import { toast } from "sonner";
 
 interface SectionFormDialogProps {
   title: string;
@@ -27,7 +30,18 @@ interface SectionFormDialogProps {
 }
 
 export const SectionForm = ({ title, onSubmit, submitLabel, form: controlledForm, setForm: controlledSetForm, open: controlledOpen, onOpenChange: controlledOnOpenChange }: SectionFormDialogProps) => {
-   const isControlled = controlledForm !== undefined;
+  const { mutate, isPending } = useMutation({
+    mutationFn: createSection,
+    onSuccess: () => {
+      toast.success("Section created successfully!")
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    }
+  })
+  
+  
+  // const isControlled = controlledForm !== undefined;
 
   const [internalOpen, setInternalOpen] = useState(false);
   const [internalForm, setInternalForm] = useState<FormSection>({
@@ -41,12 +55,30 @@ export const SectionForm = ({ title, onSubmit, submitLabel, form: controlledForm
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    onSubmit(form);
-    if (!isControlled) {
-    setInternalForm({ name: "", course: "", year_level: "", maxStudents: 40 });
-    setInternalOpen(false);
-  }
+    
+    // Add validation
+    if (!form.name.trim()) {
+      toast.error("Section name is required");
+      return;
+    }
+    if (!form.course) {
+      toast.error("Please select a course");
+      return;
+    }
+    if (!form.year_level) {
+      toast.error("Please select a year level");
+      return;
+    }
+    
+    mutate(form, {
+      onSuccess: () => {
+        onSubmit?.(form);
+      }
+    });
   };
+
+
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -116,7 +148,9 @@ export const SectionForm = ({ title, onSubmit, submitLabel, form: controlledForm
             />
           </div>
           <DialogFooter>
-            <Button type="submit">{submitLabel}</Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Creating..." : submitLabel}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
