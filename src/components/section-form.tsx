@@ -45,7 +45,7 @@ export const SectionForm = ({ title, onSubmit, submitLabel, form: controlledForm
 
   const [internalOpen, setInternalOpen] = useState(false);
   const [internalForm, setInternalForm] = useState<FormSection>({
-    name: "", course: "", year_level: "", maxStudents: 40,
+    name: "", course: "", year_level: "", max_students: 40,
   });
 
   const open = controlledOpen ?? internalOpen;
@@ -144,8 +144,8 @@ export const SectionForm = ({ title, onSubmit, submitLabel, form: controlledForm
             <Input
               type="number"
               min={1}
-              value={form.maxStudents}
-              onChange={(e) => setForm({ ...form, maxStudents: Number(e.target.value) })}
+              value={form.max_students}
+              onChange={(e) => setForm({ ...form, max_students: Number(e.target.value) })}
               className="w-full p-5"
             />
           </div>
