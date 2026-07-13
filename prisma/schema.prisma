@@ -18,9 +18,9 @@ enum Role {
   STUDENT
 }
 
-enum ApplicationsStatus {
+enum ApplicationStatus {
   PENDING
-  APRROVED
+  APPROVED
   REJECTED
 }
 
@@ -63,6 +63,28 @@ enum LearningMode {
   FACE_TO_FACE
 }
 
+enum Semester {
+  FIRST
+  SECOND
+}
+
+enum Track {
+  ACADEMIC
+  TVL
+  SPORTS
+  ARTS_AND_DESIGN
+}
+
+enum Strand {
+  STEM
+  ABM
+  HUMSS
+  GAS
+  TVL_ICT
+  TVL_HE
+  TVL_AGRI
+}
+
 model User {
   id                 Int     @id @default(autoincrement())
   username           String  @unique
@@ -76,7 +98,7 @@ model User {
   admin   Admin?
 
   createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 }
 
 model Teacher {
@@ -89,6 +111,9 @@ model Teacher {
 
   firstName String
   lastName  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Admin {
@@ -104,12 +129,15 @@ model Student {
   id Int @id @default(autoincrement())
 
   userId Int  @unique
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   studentNumber String @unique
 
   firstName String
   lastName  String
+
+  applicationId Int
+  application   EnrollmentApplication[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -124,10 +152,10 @@ model EnrollmentApplication {
   isReturning Boolean @default(false)
 
   psaNumber String?
-  lrn       Int
+  lrn       String?
 
   firstName     String
-  middlename    String?
+  middleName    String?
   lastName      String
   extensionName String?
 
@@ -138,32 +166,34 @@ model EnrollmentApplication {
   isIP        Boolean @default(false)
   ipCommunity String?
 
-  is4ps       Boolean @default(false)
+  is4Ps       Boolean @default(false)
   householdId String?
 
-  hasDisabitlity Boolean @default(false)
+  hasDisability Boolean @default(false)
 
-  lastGradeCompleted   Int?
-  lastSchoolYear       String?
-  lastSchoolAttendance String?
-  lastSchoolId         String?
+  lastGradeCompleted Int?
+  lastSchoolYear     String?
+  lastSchoolAttended String?
+  lastSchoolId       String?
 
-  semester String?
-  track    String?
-  strand   String?
+  semester Semester
+  track    Track
+  strand   Strand
 
-  status ApplicationsStatus @default(PENDING)
+  status ApplicationStatus @default(PENDING)
 
-  approveAt  DateTime?
+  approvedAt DateTime?
   rejectedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  addresses      EnrollmentApplicationAddress[]
-  parents        EnrollmentApplicationParent[]
-  disabilities   EnrollmentApplicationDisability[]
-  learningModes  EnrollmentApplicationLearningMode[]
+  addresses     EnrollmentApplicationAddress[]
+  parents       EnrollmentApplicationParent[]
+  disabilities  EnrollmentApplicationDisability[]
+  learningModes EnrollmentApplicationLearningMode[]
+  student       Student?                            @relation(fields: [studentId], references: [id])
+  studentId     Int?
 }
 
 model EnrollmentApplicationAddress {
@@ -192,7 +222,7 @@ model EnrollmentApplicationParent {
 
   type ParentType
 
-  firtName   String
+  firstName  String
   middleName String?
   lastName   String
 
