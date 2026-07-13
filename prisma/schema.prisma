@@ -1,0 +1,218 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+enum ApplicationsStatus {
+  PENDING
+  APRROVED
+  REJECTED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum AddressType {
+  CURRENT
+  PERMANENT
+}
+
+enum ParentType {
+  FATHER
+  MOTHER
+  GUARDIAN
+}
+
+enum DisabilityType {
+  VISUAL_IMPAIRMENT_BLIND
+  VISUAL_IMPAIRMENT_LOW_VISION
+  HEARING_IMPAIRMENT
+  LEARNING_DISABILITY
+  INTELLECTUAL_DISABILITY
+  AUTISM_SPECTRUM_DISORDER
+  EMOTIONAL_BEHAVIORAL_DISORDER
+  ORTHOPEDIC_PHYSICAL_HANDICAP
+  SPEECH_LANGUAGE_DISORDER
+  CEREBRAL_PALSY
+  SPECIAL_HEALTH_PROBLEM_CHRONIC_DISEASE
+  CANCER
+  MULTIPLE_DISORDER
+}
+
+enum LearningMode {
+  MODULAR_PRINT
+  MODULAR_DIGITAL
+  BLENDED
+  FACE_TO_FACE
+}
+
+model User {
+  id                 Int     @id @default(autoincrement())
+  username           String  @unique
+  password           String
+  role               Role
+  mustChangePassword Boolean @default(true)
+  isActive           Boolean @default(true)
+
+  student Student?
+  teacher Teacher?
+  admin   Admin?
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+}
+
+model Teacher {
+  id Int @id @default(autoincrement())
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  employeeId String @unique
+
+  firstName String
+  lastName  String
+}
+
+model Admin {
+  id Int @id @default(autoincrement())
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  employeeId String @unique
+}
+
+model Student {
+  id Int @id @default(autoincrement())
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  studentNumber String @unique
+
+  firstName String
+  lastName  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EnrollmentApplication {
+  id Int @id @default(autoincrement())
+
+  schoolYear  String
+  gradeLevel  Int
+  hasLRN      Boolean
+  isReturning Boolean @default(false)
+
+  psaNumber String?
+  lrn       Int
+
+  firstName     String
+  middlename    String?
+  lastName      String
+  extensionName String?
+
+  birthDate    DateTime
+  gender       Gender
+  placeOfBirth String
+
+  isIP        Boolean @default(false)
+  ipCommunity String?
+
+  is4ps       Boolean @default(false)
+  householdId String?
+
+  hasDisabitlity Boolean @default(false)
+
+  lastGradeCompleted   Int?
+  lastSchoolYear       String?
+  lastSchoolAttendance String?
+  lastSchoolId         String?
+
+  semester String?
+  track    String?
+  strand   String?
+
+  status ApplicationsStatus @default(PENDING)
+
+  approveAt  DateTime?
+  rejectedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  addresses      EnrollmentApplicationAddress[]
+  parents        EnrollmentApplicationParent[]
+  disabilities   EnrollmentApplicationDisability[]
+  learningModes  EnrollmentApplicationLearningMode[]
+}
+
+model EnrollmentApplicationAddress {
+  id Int @id @default(autoincrement())
+
+  enrollmentApplicationId Int
+  enrollmentApplication   EnrollmentApplication @relation(fields: [enrollmentApplicationId], references: [id])
+
+  type AddressType
+
+  houseNo      String?
+  street       String?
+  sitio        String?
+  barangay     String
+  municipality String
+  province     String
+  country      String
+  zipCode      String
+}
+
+model EnrollmentApplicationParent {
+  id Int @id @default(autoincrement())
+
+  enrollmentApplicationId Int
+  enrollmentApplication   EnrollmentApplication @relation(fields: [enrollmentApplicationId], references: [id])
+
+  type ParentType
+
+  firtName   String
+  middleName String?
+  lastName   String
+
+  contactNumber String?
+}
+
+model EnrollmentApplicationDisability {
+  id Int @id @default(autoincrement())
+
+  enrollmentApplicationId Int
+  enrollmentApplication   EnrollmentApplication @relation(fields: [enrollmentApplicationId], references: [id])
+
+  disabilityType DisabilityType
+}
+
+model EnrollmentApplicationLearningMode {
+  id Int @id @default(autoincrement())
+
+  enrollmentApplicationId Int
+  enrollmentApplication   EnrollmentApplication @relation(fields: [enrollmentApplicationId], references: [id])
+
+  learningMode LearningMode
+}
