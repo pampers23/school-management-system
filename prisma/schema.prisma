@@ -13,7 +13,9 @@ datasource db {
 }
 
 enum Role {
+  SUPER_ADMIN
   ADMIN
+  REGISTRAR
   TEACHER
   STUDENT
 }
@@ -38,6 +40,12 @@ enum ParentType {
   FATHER
   MOTHER
   GUARDIAN
+}
+
+enum EnrollmentStatus {
+  PENDING
+  ENROLLED
+  CANCELLED
 }
 
 enum DisabilityType {
@@ -85,6 +93,14 @@ enum Strand {
   TVL_AGRI
 }
 
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+}
+
 model User {
   id                 Int     @id @default(autoincrement())
   username           String  @unique
@@ -109,6 +125,8 @@ model Teacher {
 
   employeeId String @unique
 
+  assignments TeacherAssignment[]
+
   firstName String
   lastName  String
 
@@ -123,6 +141,9 @@ model Admin {
   user   User @relation(fields: [userId], references: [id])
 
   employeeId String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Student {
@@ -133,11 +154,13 @@ model Student {
 
   studentNumber String @unique
 
-  firstName String
-  lastName  String
+  firstName     String
+  lastName      String
+  middleName    String?
+  extensionName String?
 
-  applicationId Int
-  application   EnrollmentApplication[]
+  enrollmentApplication EnrollmentApplication?
+  enrollments           Enrollment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -146,10 +169,15 @@ model Student {
 model EnrollmentApplication {
   id Int @id @default(autoincrement())
 
-  schoolYear  String
+  studentId Int?     @unique
+  student   Student? @relation(fields: [studentId], references: [id])
+
   gradeLevel  Int
   hasLRN      Boolean
   isReturning Boolean @default(false)
+
+  schoolYearId Int
+  schoolYear   SchoolYear @relation(fields: [schoolYearId], references: [id])
 
   psaNumber String?
   lrn       String?
@@ -176,9 +204,9 @@ model EnrollmentApplication {
   lastSchoolAttended String?
   lastSchoolId       String?
 
-  semester Semester
-  track    Track
-  strand   Strand
+  semester Semester?
+  track    Track?
+  strand   Strand?
 
   status ApplicationStatus @default(PENDING)
 
@@ -188,12 +216,28 @@ model EnrollmentApplication {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  remarks String?
+
   addresses     EnrollmentApplicationAddress[]
   parents       EnrollmentApplicationParent[]
   disabilities  EnrollmentApplicationDisability[]
   learningModes EnrollmentApplicationLearningMode[]
-  student       Student?                            @relation(fields: [studentId], references: [id])
-  studentId     Int?
+}
+
+model SchoolYear {
+  id Int @id @default(autoincrement())
+
+  name String @unique
+
+  isCurrent Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  enrollments           Enrollment[]
+  curriculums           Curriculum[]
+  enrollmentApplication EnrollmentApplication[]
+  teachersAssignments   TeacherAssignment[]
 }
 
 model EnrollmentApplicationAddress {
@@ -245,4 +289,168 @@ model EnrollmentApplicationLearningMode {
   enrollmentApplication   EnrollmentApplication @relation(fields: [enrollmentApplicationId], references: [id])
 
   learningMode LearningMode
+}
+
+model Subject {
+  id Int @id @default(autoincrement())
+
+  code String @unique
+
+  name String @unique
+
+  description String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  curriculumSubjects CurriculumSubject[]
+  sectionSubjects    SectionSubject[]
+}
+
+model Curriculum {
+  id Int @id @default(autoincrement())
+
+  curriculumName String
+
+  gradeLevel Int
+
+  track Track?
+
+  strand Strand?
+
+  schoolYearId Int
+
+  schoolYear SchoolYear @relation(fields: [schoolYearId], references: [id])
+
+  curriculumSubjects CurriculumSubject[]
+
+  section Section[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([gradeLevel, schoolYearId, track, strand])  
+}
+
+model CurriculumSubject {
+  curriculumId Int
+
+  subjectId Int
+
+  curriculum Curriculum @relation(fields: [curriculumId], references: [id], onDelete: Cascade)
+
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@id([curriculumId, subjectId])
+}
+
+model Section {
+  id Int @id @default(autoincrement())
+
+  name String
+
+  curriculumId Int
+
+  curriculum Curriculum @relation(fields: [curriculumId], references: [id])
+
+  enrollments Enrollment[]
+
+  sectionSubjects SectionSubject[]
+
+  schedules Schedule[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, curriculumId])
+}
+
+model Enrollment {
+  id Int @id @default(autoincrement())
+
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [id])
+
+  schoolYearId Int
+  schoolYear   SchoolYear @relation(fields: [schoolYearId], references: [id])
+
+  sectionId Int
+  section   Section @relation(fields: [sectionId], references: [id])
+
+  status EnrollmentStatus @default(ENROLLED)
+
+  enrolledAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, schoolYearId])
+}
+
+model Room {
+  id Int @id @default(autoincrement())
+
+  name     String
+  building String
+
+  schedules Schedule[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SectionSubject {
+  id Int @id @default(autoincrement())
+
+  sectionId Int
+  subjectId Int
+
+  section Section @relation(fields: [sectionId], references: [id])
+  subject Subject @relation(fields: [subjectId], references: [id])
+
+  teacherAssignment TeacherAssignment?
+
+  schedules Schedule[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sectionId, subjectId])
+}
+
+model TeacherAssignment {
+  id Int @id @default(autoincrement())
+
+  teacherId Int
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+
+  sectionSubjectId Int            @unique
+  sectionSubject   SectionSubject @relation(fields: [sectionSubjectId], references: [id])
+
+  schoolYearId Int
+  schoolYear SchoolYear @relation(fields: [schoolYearId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Schedule {
+  id Int @id @default(autoincrement())
+
+  sectionId Int
+  section   Section @relation(fields: [sectionId], references: [id])
+
+  roomId Int
+  room   Room @relation(fields: [roomId], references: [id])
+
+  sectionSubjectId Int
+  sectionSubject   SectionSubject @relation(fields: [sectionSubjectId], references: [id])
+
+  day DayOfWeek
+
+  startTime DateTime
+  endTime   DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
