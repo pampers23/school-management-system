@@ -36,6 +36,8 @@ export class AuthService {
       sub: user.id,
       username: user.username,
       role: user.role,
+      mustChangePassword: user.mustChangePassword,
+      isActive: user.isActive,
     };
 
     const accessToken = await this.jwtService.signAsync(payload);
@@ -46,6 +48,7 @@ export class AuthService {
         id: user.id,
         username: user.username,
         role: user.role,
+        mustChangePassword: user.mustChangePassword,
       },
     };
   }
