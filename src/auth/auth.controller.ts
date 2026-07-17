@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Patch } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -7,6 +7,7 @@ import { Role } from '../../generated/prisma/enums';
 import { RolesGuard } from './guards/roles.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import type { JwtUser } from '../type';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -17,16 +18,13 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Get('me')
-  // me(@Req() req: Request & { user: { id: number } }) {
-  //   return this.authService.me(req.user.id);
-  // }
-
+  @Patch('change-password')
   @UseGuards(JwtAuthGuard)
-  @Post('change-password')
-  changePassword() {
-    return this.authService.changePassword();
+  changePassword(
+    @CurrentUser('id') userId: number,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return this.authService.changePassword(userId, dto);
   }
 
   @Get('admin')

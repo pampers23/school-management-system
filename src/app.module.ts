@@ -5,6 +5,7 @@ import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
+import { SchoolYearModule } from './school-year/school-year.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ConfigModule } from '@nestjs/config';
     }),
     AuthModule,
     PrismaModule,
+    SchoolYearModule,
   ],
   controllers: [AppController, AuthController],
   providers: [AppService],
