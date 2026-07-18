@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { SchoolYearModule } from './school-year/school-year.module';
 import { SubjectModule } from './subject/subject.module';
+import { CurriculumModule } from './curriculum/curriculum.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { SubjectModule } from './subject/subject.module';
     PrismaModule,
     SchoolYearModule,
     SubjectModule,
+    CurriculumModule,
   ],
   controllers: [AppController, AuthController],
   providers: [AppService],
