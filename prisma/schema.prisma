@@ -6,6 +6,7 @@
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
+  moduleFormat = "cjs"
 }
 
 datasource db {
@@ -231,6 +232,9 @@ model SchoolYear {
 
   isCurrent Boolean @default(false)
 
+  startYear Int
+  endYear   Int
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -238,6 +242,8 @@ model SchoolYear {
   curriculums           Curriculum[]
   enrollmentApplication EnrollmentApplication[]
   teachersAssignments   TeacherAssignment[]
+
+  @@unique([startYear, endYear])
 }
 
 model EnrollmentApplicationAddress {
@@ -300,6 +306,8 @@ model Subject {
 
   description String?
 
+  isActive Boolean @default(true)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -329,7 +337,7 @@ model Curriculum {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([gradeLevel, schoolYearId, track, strand])  
+  @@unique([gradeLevel, schoolYearId, track, strand])
 }
 
 model CurriculumSubject {
@@ -428,10 +436,10 @@ model TeacherAssignment {
   sectionSubject   SectionSubject @relation(fields: [sectionSubjectId], references: [id])
 
   schoolYearId Int
-  schoolYear SchoolYear @relation(fields: [schoolYearId], references: [id])
+  schoolYear   SchoolYear @relation(fields: [schoolYearId], references: [id])
 
   createdAt DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 }
 
 model Schedule {
