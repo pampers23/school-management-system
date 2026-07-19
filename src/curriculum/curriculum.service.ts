@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCurriculumDto } from './dto/create-curriculum.dto';
 import { UpdateCurriculumDto } from './dto/update-curriculum.dto';
+import { AddSubjectDto } from './dto/add-subject.dto';
 
 @Injectable()
 export class CurriculumService {
@@ -158,5 +159,59 @@ export class CurriculumService {
     return this.prisma.curriculum.delete({
       where: { id },
     });
+  }
+
+  async addSubjects(curriculumId: number, dto: AddSubjectDto) {
+    await this.findOne(curriculumId);
+
+    const subjects = await this.prisma.subject.findMany({
+      where: {
+        id: {
+          in: dto.subjectIds,
+        },
+      },
+    });
+
+    if (subjects.length !== dto.subjectIds.length) {
+      throw new NotFoundException('One or more subjects do not exists.');
+    }
+
+    await this.prisma.curriculumSubject.createMany({
+      data: dto.subjectIds.map((subjectId) => ({
+        curriculumId,
+        subjectId,
+      })),
+      skipDuplicates: true,
+    });
+
+    return this.getSubjects(curriculumId);
+  }
+
+  async getSubjects(curriculumId: number) {
+    return this.prisma.curriculum.findUnique({
+      where: {
+        id: curriculumId,
+      },
+      include: {
+        curriculumSubjects: {
+          include: {
+            subject: true,
+          },
+        },
+      },
+    });
+  }
+
+  async removeSubject(curriculumId: number, subjectId: number) {
+    await this.prisma.curriculumSubject.delete({
+      where: {
+        curriculumId_subjectId: {
+          curriculumId,
+          subjectId,
+        },
+      },
+    });
+
+    return { message: 'Subject moved successfully.' };
   }
 }
