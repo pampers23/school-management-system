@@ -16,6 +16,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../../generated/prisma/enums';
 import { CreateCurriculumDto } from './dto/create-curriculum.dto';
 import { UpdateCurriculumDto } from './dto/update-curriculum.dto';
+import { AddSubjectDto } from './dto/add-subject.dto';
 
 @Controller('curriculum')
 export class CurriculumController {
@@ -57,5 +58,32 @@ export class CurriculumController {
   @Roles(Role.ADMIN)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.curriculumService.remove(id);
+  }
+
+  @Post(':id/subjects/add')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  addSubjects(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AddSubjectDto,
+  ) {
+    return this.curriculumService.addSubjects(id, dto);
+  }
+
+  @Get(':id/subjects')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  getSubjects(@Param('id', ParseIntPipe) id: number) {
+    return this.curriculumService.getSubjects(id);
+  }
+
+  @Delete(':id/subjects/:subjectId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  removeSubject(
+    @Param('id', ParseIntPipe) curriculumId: number,
+    @Body('subjectId', ParseIntPipe) subjectId: number,
+  ) {
+    return this.curriculumService.removeSubject(curriculumId, subjectId);
   }
 }
