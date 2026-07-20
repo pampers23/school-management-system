@@ -357,6 +357,10 @@ model Section {
 
   name String
 
+  capacity Int @default(40)
+
+  isActive Boolean @default(true)
+
   curriculumId Int
 
   curriculum Curriculum @relation(fields: [curriculumId], references: [id])
