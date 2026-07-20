@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { SchoolYearModule } from './school-year/school-year.module';
 import { SubjectModule } from './subject/subject.module';
 import { CurriculumModule } from './curriculum/curriculum.module';
+import { SectionsModule } from './sections/sections.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CurriculumModule } from './curriculum/curriculum.module';
     SchoolYearModule,
     SubjectModule,
     CurriculumModule,
+    SectionsModule,
   ],
   controllers: [AppController, AuthController],
   providers: [AppService],

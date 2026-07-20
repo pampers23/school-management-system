@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `section` ADD COLUMN `capacity` INTEGER NOT NULL DEFAULT 40,
+    ADD COLUMN `isActive` BOOLEAN NOT NULL DEFAULT true;
