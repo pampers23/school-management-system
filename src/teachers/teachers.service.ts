@@ -122,4 +122,21 @@ export class TeachersService {
 
     return { message: 'Teacher deactivated successfully' };
   }
+
+  async activate(id: number) {
+    const teacher = await this.findOne(id);
+
+    await this.prisma.user.update({
+      where: {
+        id: teacher.userId,
+      },
+      data: {
+        isActive: true,
+      },
+    });
+
+    return {
+      message: 'Teacher reactivated successfully.',
+    };
+  }
 }

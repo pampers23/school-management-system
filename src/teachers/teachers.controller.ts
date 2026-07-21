@@ -55,4 +55,11 @@ export class TeachersController {
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.teacherService.remove(id);
   }
+
+  @Patch(':id/activate')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  activate(@Param('id', ParseIntPipe) id: number) {
+    return this.teacherService.activate(id);
+  }
 }
