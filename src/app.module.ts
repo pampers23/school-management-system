@@ -10,6 +10,7 @@ import { SubjectModule } from './subject/subject.module';
 import { CurriculumModule } from './curriculum/curriculum.module';
 import { SectionsModule } from './sections/sections.module';
 import { TeachersModule } from './teachers/teachers.module';
+import { TeacherAssignmentModule } from './teacher-assignment/teacher-assignment.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { TeachersModule } from './teachers/teachers.module';
     CurriculumModule,
     SectionsModule,
     TeachersModule,
+    TeacherAssignmentModule,
   ],
   controllers: [AppController, AuthController],
   providers: [AppService],
