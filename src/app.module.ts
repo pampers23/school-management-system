@@ -11,6 +11,7 @@ import { CurriculumModule } from './curriculum/curriculum.module';
 import { SectionsModule } from './sections/sections.module';
 import { TeachersModule } from './teachers/teachers.module';
 import { TeacherAssignmentModule } from './teacher-assignment/teacher-assignment.module';
+import { ScheduleModule } from './schedule/schedule.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { TeacherAssignmentModule } from './teacher-assignment/teacher-assignment
     SectionsModule,
     TeachersModule,
     TeacherAssignmentModule,
+    ScheduleModule,
   ],
   controllers: [AppController, AuthController],
   providers: [AppService],
