@@ -12,6 +12,7 @@ import { SectionsModule } from './sections/sections.module';
 import { TeachersModule } from './teachers/teachers.module';
 import { TeacherAssignmentModule } from './teacher-assignment/teacher-assignment.module';
 import { ScheduleModule } from './schedule/schedule.module';
+import { RoomModule } from './room/room.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ScheduleModule } from './schedule/schedule.module';
     TeachersModule,
     TeacherAssignmentModule,
     ScheduleModule,
+    RoomModule,
   ],
   controllers: [AppController, AuthController],
   providers: [AppService],

@@ -407,6 +407,8 @@ model Room {
   name     String
   building String
 
+  isActive Boolean @default(true)
+
   schedules Schedule[]
 
   createdAt DateTime @default(now())
@@ -464,8 +466,8 @@ model Schedule {
 
   day DayOfWeek
 
-  startTime DateTime
-  endTime   DateTime
+  startTime String
+  endTime   String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

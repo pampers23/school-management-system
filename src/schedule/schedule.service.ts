@@ -37,9 +37,10 @@ export class ScheduleService {
       );
     }
 
-    const room = await this.prisma.room.findUnique({
+    const room = await this.prisma.room.findFirst({
       where: {
         id: dto.roomId,
+        isActive: true,
       },
     });
 
