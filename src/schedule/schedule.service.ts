@@ -12,6 +12,7 @@ export class ScheduleService {
   constructor(private prisma: PrismaService) {}
 
   async create(dto: CreateScheduleDto) {
+    // 1. Validate Section
     const section = await this.prisma.section.findUnique({
       where: {
         id: dto.sectionId,
@@ -22,6 +23,7 @@ export class ScheduleService {
       throw new NotFoundException('Section not found.');
     }
 
+    // 2. Validate Section Subject
     const sectionSubject = await this.prisma.sectionSubject.findUnique({
       where: {
         id: dto.sectionSubjectId,
@@ -34,10 +36,11 @@ export class ScheduleService {
 
     if (sectionSubject.sectionId !== dto.sectionId) {
       throw new BadRequestException(
-        'The section subject does not belong to this section',
+        'The section subject does not belong to this section.',
       );
     }
 
+    // 3. Validate Room
     const room = await this.prisma.room.findFirst({
       where: {
         id: dto.roomId,
@@ -49,6 +52,27 @@ export class ScheduleService {
       throw new NotFoundException('Room not found.');
     }
 
+    // 4. Room Conflict
+    const roomConflict = await this.prisma.schedule.findFirst({
+      where: {
+        roomId: dto.roomId,
+        day: dto.day,
+        startTime: {
+          lt: dto.endTime,
+        },
+        endTime: {
+          gt: dto.startTime,
+        },
+      },
+    });
+
+    if (roomConflict) {
+      throw new BadRequestException(
+        'The room already has a schedule during this time.',
+      );
+    }
+
+    // 5. Section Conflict
     const sectionConflict = await this.prisma.schedule.findFirst({
       where: {
         sectionId: dto.sectionId,
@@ -64,10 +88,43 @@ export class ScheduleService {
 
     if (sectionConflict) {
       throw new BadRequestException(
-        'The section already schedule during this time.',
+        'The section already has a schedule during this time.',
       );
     }
 
+    // 6. Teacher Conflict
+    const teacherAssignment = await this.prisma.teacherAssignment.findUnique({
+      where: {
+        sectionSubjectId: dto.sectionSubjectId,
+      },
+    });
+
+    if (teacherAssignment) {
+      const teacherConflict = await this.prisma.schedule.findFirst({
+        where: {
+          day: dto.day,
+          startTime: {
+            lt: dto.endTime,
+          },
+          endTime: {
+            gt: dto.startTime,
+          },
+          sectionSubject: {
+            teacherAssignment: {
+              teacherId: teacherAssignment.teacherId,
+            },
+          },
+        },
+      });
+
+      if (teacherConflict) {
+        throw new BadRequestException(
+          'The teacher already has a schedule during this time.',
+        );
+      }
+    }
+
+    // 7. Create Schedule
     return this.prisma.schedule.create({
       data: {
         sectionId: dto.sectionId,
@@ -184,22 +241,50 @@ export class ScheduleService {
       );
     }
 
+    const teacherAssignment = await this.prisma.teacherAssignment.findUnique({
+      where: {
+        sectionSubjectId: dto.sectionSubjectId,
+      },
+    });
+
+    if (teacherAssignment) {
+      const teacherConflict = await this.prisma.schedule.findFirst({
+        where: {
+          day: dto.day,
+          startTime: {
+            lt: dto.endTime,
+          },
+          endTime: {
+            gt: dto.startTime,
+          },
+          sectionSubject: {
+            teacherAssignment: {
+              teacherId: teacherAssignment.teacherId,
+            },
+          },
+        },
+      });
+
+      if (teacherConflict) {
+        throw new BadRequestException(
+          'The teacher already has a schedule during this time.',
+        );
+      }
+    }
+
     if (startTime >= endTime) {
       throw new BadRequestException('Start time must be before end time.');
     }
 
     const roomConflict = await this.prisma.schedule.findFirst({
       where: {
-        id: {
-          not: id,
-        },
-        roomId,
-        day,
+        roomId: dto.roomId,
+        day: dto.day,
         startTime: {
-          lt: startTime,
+          lt: dto.endTime,
         },
         endTime: {
-          gt: endTime,
+          gt: dto.startTime,
         },
       },
     });
