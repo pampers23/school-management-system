@@ -13,6 +13,11 @@ import { TeachersModule } from './teachers/teachers.module';
 import { TeacherAssignmentModule } from './teacher-assignment/teacher-assignment.module';
 import { ScheduleModule } from './schedule/schedule.module';
 import { RoomModule } from './room/room.module';
+import { EnrollmentsService } from './enrollments/enrollments.service';
+import { EnrollmentsModule } from './enrollments/enrollments.module';
+import { StudentsService } from './students/students.service';
+import { StudentsModule } from './students/students.module';
+import { EnrollmentApplicationModule } from './enrollment-application/enrollment-application.module';
 
 @Module({
   imports: [
@@ -29,8 +34,11 @@ import { RoomModule } from './room/room.module';
     TeacherAssignmentModule,
     ScheduleModule,
     RoomModule,
+    EnrollmentsModule,
+    StudentsModule,
+    EnrollmentApplicationModule,
   ],
   controllers: [AppController, AuthController],
-  providers: [AppService],
+  providers: [AppService, EnrollmentsService, StudentsService],
 })
 export class AppModule {}
