@@ -31,6 +31,12 @@ export class StudentsService {
       );
     }
 
+    if (application.student) {
+      throw new BadRequestException(
+        'A student account has already been created for this application.',
+      );
+    }
+
     const year = new Date().getFullYear();
 
     const lastStudent = await this.prisma.student.findFirst({
