@@ -10,10 +10,10 @@ import { PrismaService } from '../prisma/prisma.service';
 export class EnrollmentsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(dto: CreateEnrollmentDto) {
+  async create(userId: number, dto: CreateEnrollmentDto) {
     const student = await this.prisma.student.findUnique({
       where: {
-        id: dto.studentId,
+        userId,
       },
       include: {
         enrollmentApplication: true,
@@ -86,7 +86,7 @@ export class EnrollmentsService {
     const existingEnrollment = await this.prisma.enrollment.findUnique({
       where: {
         studentId_schoolYearId: {
-          studentId: dto.studentId,
+          studentId: student.id,
           schoolYearId: dto.schoolYearId,
         },
       },
@@ -100,7 +100,7 @@ export class EnrollmentsService {
 
     return this.prisma.enrollment.create({
       data: {
-        studentId: dto.studentId,
+        studentId: student.id,
         schoolYearId: dto.schoolYearId,
         sectionId: dto.sectionId,
         status: 'ENROLLED',
@@ -110,6 +110,130 @@ export class EnrollmentsService {
         student: true,
         schoolYear: true,
         section: true,
+      },
+    });
+  }
+
+  async findAll() {
+    return this.prisma.enrollment.findMany({
+      include: {
+        student: true,
+        schoolYear: true,
+        section: {
+          include: {
+            curriculum: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+  }
+
+  async findOne(id: number) {
+    const enrollment = await this.prisma.enrollment.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        student: true,
+        schoolYear: true,
+        section: {
+          include: {
+            curriculum: true,
+          },
+        },
+      },
+    });
+
+    if (!enrollment) {
+      throw new NotFoundException('Enrollment not found.');
+    }
+
+    return enrollment;
+  }
+
+  async findMyEnrollments(studentId: number) {
+    const student = await this.prisma.student.findUnique({
+      where: {
+        id: studentId,
+      },
+    });
+
+    if (!student) {
+      throw new NotFoundException('Student not found.');
+    }
+
+    return this.prisma.enrollment.findMany({
+      where: {
+        studentId,
+      },
+      include: {
+        schoolYear: true,
+        section: {
+          include: {
+            curriculum: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+  }
+
+  async cancel(id: number) {
+    const enrollment = await this.prisma.enrollment.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!enrollment) {
+      throw new NotFoundException('Enrollment not found.');
+    }
+
+    return this.prisma.enrollment.update({
+      where: {
+        id,
+      },
+      data: {
+        status: 'CANCELLED',
+      },
+      include: {
+        student: true,
+        schoolYear: true,
+        section: true,
+      },
+    });
+  }
+
+  async findByUserId(userId: number) {
+    const student = await this.prisma.student.findUnique({
+      where: {
+        userId,
+      },
+    });
+
+    if (!student) {
+      throw new NotFoundException('Student profile not found.');
+    }
+
+    return this.prisma.enrollment.findMany({
+      where: {
+        studentId: student.id,
+      },
+      include: {
+        schoolYear: true,
+        section: {
+          include: {
+            curriculum: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'asc',
       },
     });
   }
