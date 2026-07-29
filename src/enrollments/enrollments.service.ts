@@ -15,10 +15,15 @@ export class EnrollmentsService {
       where: {
         id: dto.studentId,
       },
+      include: {
+        enrollmentApplication: true,
+      },
     });
 
-    if (!student) {
-      throw new NotFoundException('Student not found.');
+    if (!student?.enrollmentApplication) {
+      throw new NotFoundException(
+        'Student does not have an enrollment application.',
+      );
     }
 
     const schoolYear = await this.prisma.schoolYear.findUnique({
@@ -35,6 +40,9 @@ export class EnrollmentsService {
       where: {
         id: dto.sectionId,
       },
+      include: {
+        curriculum: true,
+      },
     });
 
     if (!section) {
@@ -44,6 +52,22 @@ export class EnrollmentsService {
     if (!section.isActive) {
       throw new BadRequestException(
         'Cannot enroll a student in an inactive section.',
+      );
+    }
+
+    const studentGradeLevel = student.enrollmentApplication.gradeLevel;
+
+    const sectionGradeLevel = section.curriculum.gradeLevel;
+
+    if (studentGradeLevel !== sectionGradeLevel) {
+      throw new BadRequestException(
+        `Student is Grade ${studentGradeLevel} and cannot enroll in a Grade ${sectionGradeLevel} section`,
+      );
+    }
+
+    if (section.curriculum.schoolYearId !== dto.schoolYearId) {
+      throw new BadRequestException(
+        'The selected section does not belong to the selected school year',
       );
     }
 
