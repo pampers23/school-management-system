@@ -1,4 +1,12 @@
-import { Controller, Post, UseGuards, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UseGuards,
+  Body,
+  Get,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -19,5 +27,15 @@ export class AttendanceController {
     @Body() dto: CreateAttendanceSessionDto,
   ) {
     return this.attendanceService.createAttendanceSession(userId, dto);
+  }
+
+  @Get('sessions/:id/students')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.TEACHER)
+  findStudentForAttendance(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('id') userId: number,
+  ) {
+    return this.attendanceService.findStudentForAttendance(id, userId);
   }
 }
