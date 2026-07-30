@@ -14,6 +14,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../../generated/prisma/enums';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { CreateAttendanceSessionDto } from './dto/create-attendance-session.dto';
+import { CreateAttendanceDto } from './dto/create-attendance.dto';
 
 @Controller('attendance')
 export class AttendanceController {
@@ -37,5 +38,15 @@ export class AttendanceController {
     @CurrentUser('id') userId: number,
   ) {
     return this.attendanceService.findStudentForAttendance(id, userId);
+  }
+
+  @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.TEACHER)
+  createAttendance(
+    @CurrentUser('id') userId: number,
+    @Body() dto: CreateAttendanceDto,
+  ) {
+    return this.attendanceService.createAttendance(userId, dto);
   }
 }
