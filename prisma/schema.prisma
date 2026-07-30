@@ -102,6 +102,13 @@ enum DayOfWeek {
   FRIDAY
 }
 
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
 model User {
   id                 Int     @id @default(autoincrement())
   username           String  @unique
@@ -137,6 +144,8 @@ model Teacher {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  attendanceSessoins AttendanceSessoin[]
 }
 
 model Admin {
@@ -169,6 +178,8 @@ model Student {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  attendances Attendance[]
 }
 
 model EnrollmentApplication {
@@ -250,6 +261,7 @@ model SchoolYear {
   teachersAssignments   TeacherAssignment[]
 
   @@unique([startYear, endYear])
+  attendanceSessoins AttendanceSessoin[]
 }
 
 model EnrollmentApplicationAddress {
@@ -436,6 +448,7 @@ model SectionSubject {
   updatedAt DateTime @updatedAt
 
   @@unique([sectionId, subjectId])
+  attendanceSessoins AttendanceSessoin[]
 }
 
 model TeacherAssignment {
@@ -492,4 +505,45 @@ model EnrollmentApplicationReview {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @default(now())
+}
+
+model AttendanceSessoin {
+  id Int @id @default(autoincrement())
+
+  sectionSubjectId Int
+  sectionSubject SectionSubject @relation(fields: [sectionSubjectId], references: [id])
+
+  schoolYearId Int
+  schoolYear SchoolYear @relation(fields: [schoolYearId], references: [id])
+
+  attendanceDate DateTime
+
+  createdByTeacherId Int
+  createdByTeacher Teacher @relation(fields: [createdByTeacherId], references: [id])
+
+  attendances Attendance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sectionSubjectId, attendanceDate])
+}
+
+model Attendance {
+  id Int @id @default(autoincrement())
+
+  attendanceSessionId Int
+  attendanceSession AttendanceSessoin @relation(fields: [attendanceSessionId], references: [id])
+
+  studentId Int
+  student Student @relation(fields: [studentId], references: [id])
+
+  status AttendanceStatus
+
+  remarks String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([attendanceSessionId, studentId])
 }
