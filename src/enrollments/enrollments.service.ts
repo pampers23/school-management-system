@@ -220,7 +220,7 @@ export class EnrollmentsService {
       throw new NotFoundException('Student profile not found.');
     }
 
-    return this.prisma.enrollment.findMany({
+    return this.prisma.enrollment.findFirst({
       where: {
         studentId: student.id,
       },
@@ -229,6 +229,29 @@ export class EnrollmentsService {
         section: {
           include: {
             curriculum: true,
+            sectionSubjects: {
+              include: {
+                subject: true,
+                teacherAssignment: {
+                  include: {
+                    teacher: {
+                      select: {
+                        employeeId: true,
+                        firstName: true,
+                        middleName: true,
+                        lastName: true,
+                        extensionName: true,
+                      },
+                    },
+                  },
+                },
+                schedules: {
+                  include: {
+                    room: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
