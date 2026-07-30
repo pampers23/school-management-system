@@ -109,4 +109,70 @@ export class AttendanceService {
       },
     });
   }
+
+  async findStudentForAttendance(attendanceSessionId: number, userId: number) {
+    const teacher = await this.prisma.teacher.findUnique({
+      where: {
+        userId,
+      },
+    });
+
+    if (!teacher) {
+      throw new NotFoundException('Teacher profile not found');
+    }
+
+    const attendanceSession = await this.prisma.attendanceSession.findUnique({
+      where: {
+        id: attendanceSessionId,
+      },
+      include: {
+        sectionSubject: true,
+      },
+    });
+
+    if (!attendanceSession) {
+      throw new NotFoundException('Attendance session not found.');
+    }
+
+    const assignment = await this.prisma.teacherAssignment.findFirst({
+      where: {
+        teacherId: teacher.id,
+        sectionSubjectId: attendanceSession.sectionSubjectId,
+        schoolYearId: attendanceSession.schoolYearId,
+      },
+    });
+
+    if (!assignment) {
+      throw new ForbiddenException(
+        'You are not assigned to this attendance session.',
+      );
+    }
+
+    const enrollments = await this.prisma.enrollment.findMany({
+      where: {
+        sectionId: attendanceSession.sectionSubject.sectionId,
+        schoolYearId: attendanceSession.schoolYearId,
+        status: 'ENROLLED',
+      },
+      include: {
+        student: {
+          select: {
+            id: true,
+            studentNumber: true,
+            firstName: true,
+            middleName: true,
+            lastName: true,
+            extensionName: true,
+          },
+        },
+      },
+      orderBy: {
+        student: {
+          lastName: 'asc',
+        },
+      },
+    });
+
+    return enrollments.map(({ student }) => student);
+  }
 }
