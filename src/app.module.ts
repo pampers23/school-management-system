@@ -18,6 +18,7 @@ import { EnrollmentsModule } from './enrollments/enrollments.module';
 import { StudentsService } from './students/students.service';
 import { StudentsModule } from './students/students.module';
 import { EnrollmentApplicationModule } from './enrollment-application/enrollment-application.module';
+import { AttendanceModule } from './attendance/attendance.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { EnrollmentApplicationModule } from './enrollment-application/enrollment
     EnrollmentsModule,
     StudentsModule,
     EnrollmentApplicationModule,
+    AttendanceModule,
   ],
   controllers: [AppController, AuthController],
   providers: [AppService, EnrollmentsService, StudentsService],

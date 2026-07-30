@@ -145,7 +145,7 @@ model Teacher {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  attendanceSessoins AttendanceSessoin[]
+  attendanceSessoins AttendanceSession[]
 }
 
 model Admin {
@@ -261,7 +261,7 @@ model SchoolYear {
   teachersAssignments   TeacherAssignment[]
 
   @@unique([startYear, endYear])
-  attendanceSessoins AttendanceSessoin[]
+  attendanceSessoins AttendanceSession[]
 }
 
 model EnrollmentApplicationAddress {
@@ -448,7 +448,7 @@ model SectionSubject {
   updatedAt DateTime @updatedAt
 
   @@unique([sectionId, subjectId])
-  attendanceSessoins AttendanceSessoin[]
+  attendanceSessoins AttendanceSession[]
 }
 
 model TeacherAssignment {
@@ -507,7 +507,7 @@ model EnrollmentApplicationReview {
   updatedAt DateTime @updatedAt @default(now())
 }
 
-model AttendanceSessoin {
+model AttendanceSession {
   id Int @id @default(autoincrement())
 
   sectionSubjectId Int
@@ -533,7 +533,7 @@ model Attendance {
   id Int @id @default(autoincrement())
 
   attendanceSessionId Int
-  attendanceSession AttendanceSessoin @relation(fields: [attendanceSessionId], references: [id])
+  attendanceSession AttendanceSession @relation(fields: [attendanceSessionId], references: [id])
 
   studentId Int
   student Student @relation(fields: [studentId], references: [id])
