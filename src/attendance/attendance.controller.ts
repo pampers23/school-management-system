@@ -49,4 +49,11 @@ export class AttendanceController {
   ) {
     return this.attendanceService.createAttendance(userId, dto);
   }
+
+  @Get('my')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.STUDENT)
+  findMyAttendance(@CurrentUser('id') userId: number) {
+    return this.attendanceService.findMyAttendance(userId);
+  }
 }
