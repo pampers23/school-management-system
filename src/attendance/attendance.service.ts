@@ -270,4 +270,43 @@ export class AttendanceService {
       attendance,
     };
   }
+
+  async findMyAttendance(userId: number) {
+    const student = await this.prisma.student.findUnique({
+      where: {
+        userId,
+      },
+    });
+
+    if (!student) {
+      throw new NotFoundException('Student profile not found');
+    }
+
+    return this.prisma.attendance.findMany({
+      where: {
+        studentId: student.id,
+      },
+      include: {
+        attendanceSession: {
+          include: {
+            sectionSubject: {
+              include: {
+                subject: true,
+                teacherAssignment: {
+                  include: {
+                    teacher: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        attendanceSession: {
+          attendanceDate: 'asc',
+        },
+      },
+    });
+  }
 }
