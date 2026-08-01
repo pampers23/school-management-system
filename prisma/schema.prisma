@@ -109,6 +109,12 @@ enum AttendanceStatus {
   EXCUSED
 }
 
+enum AssessmentType {
+  WRITTEN_WORK
+  PERFORMANCE_TASK
+  QUARTERLY_ASSESSMENT
+}
+
 model User {
   id                 Int     @id @default(autoincrement())
   username           String  @unique
@@ -180,6 +186,10 @@ model Student {
   updatedAt DateTime @updatedAt
 
   attendances Attendance[]
+
+  studentAssessmentScores StudentAssessmentScore[]
+
+  quarterlyGrades QuarterlyGrade[]
 }
 
 model EnrollmentApplication {
@@ -259,9 +269,10 @@ model SchoolYear {
   curriculums           Curriculum[]
   enrollmentApplication EnrollmentApplication[]
   teachersAssignments   TeacherAssignment[]
+  attendanceSessoins    AttendanceSession[]
+  gradingPeriods        GradingPeriod[]
 
   @@unique([startYear, endYear])
-  attendanceSessoins AttendanceSession[]
 }
 
 model EnrollmentApplicationAddress {
@@ -444,11 +455,14 @@ model SectionSubject {
 
   schedules Schedule[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  attendanceSessoins AttendanceSession[]
+  assessmentItems    AssessmentItem[]
+  quarterlyGrades    QuarterlyGrade[]
+  assessmentWeights  AssessmentWeight[]
 
   @@unique([sectionId, subjectId])
-  attendanceSessoins AttendanceSession[]
 }
 
 model TeacherAssignment {
@@ -457,7 +471,7 @@ model TeacherAssignment {
   teacherId Int
   teacher   Teacher @relation(fields: [teacherId], references: [id])
 
-  sectionSubjectId Int             @unique
+  sectionSubjectId Int            @unique
   sectionSubject   SectionSubject @relation(fields: [sectionSubjectId], references: [id])
 
   schoolYearId Int
@@ -493,8 +507,8 @@ model Schedule {
 model EnrollmentApplicationReview {
   id Int @id @default(autoincrement())
 
-  enrollmentApplicationId  Int @unique
-  enrollmentApplication EnrollmentApplication @relation(fields: [enrollmentApplicationId], references: [id], onDelete: Cascade)
+  enrollmentApplicationId Int                   @unique
+  enrollmentApplication   EnrollmentApplication @relation(fields: [enrollmentApplicationId], references: [id], onDelete: Cascade)
 
   reviewId Int
   reviewer User @relation(fields: [reviewId], references: [id])
@@ -504,22 +518,22 @@ model EnrollmentApplicationReview {
   reviewedAt DateTime?
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model AttendanceSession {
   id Int @id @default(autoincrement())
 
   sectionSubjectId Int
-  sectionSubject SectionSubject @relation(fields: [sectionSubjectId], references: [id])
+  sectionSubject   SectionSubject @relation(fields: [sectionSubjectId], references: [id])
 
   schoolYearId Int
-  schoolYear SchoolYear @relation(fields: [schoolYearId], references: [id])
+  schoolYear   SchoolYear @relation(fields: [schoolYearId], references: [id])
 
   attendanceDate DateTime
 
   createdByTeacherId Int
-  createdByTeacher Teacher @relation(fields: [createdByTeacherId], references: [id])
+  createdByTeacher   Teacher @relation(fields: [createdByTeacherId], references: [id])
 
   attendances Attendance[]
 
@@ -533,10 +547,10 @@ model Attendance {
   id Int @id @default(autoincrement())
 
   attendanceSessionId Int
-  attendanceSession AttendanceSession @relation(fields: [attendanceSessionId], references: [id])
+  attendanceSession   AttendanceSession @relation(fields: [attendanceSessionId], references: [id])
 
   studentId Int
-  student Student @relation(fields: [studentId], references: [id])
+  student   Student @relation(fields: [studentId], references: [id])
 
   status AttendanceStatus
 
@@ -546,4 +560,114 @@ model Attendance {
   updatedAt DateTime @updatedAt
 
   @@unique([attendanceSessionId, studentId])
+}
+
+model GradingPeriod {
+  id Int @id @default(autoincrement())
+
+  name    String
+  quarter Int
+
+  schoolYearId Int
+  schoolYear   SchoolYear @relation(fields: [schoolYearId], references: [id])
+
+  isCurrent Boolean @default(false)
+  isOpen    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assessmentItems   AssessmentItem[]
+  quarterlyGrades   QuarterlyGrade[]
+  assessmentWeights AssessmentWeight[]
+
+  @@unique([schoolYearId, quarter])
+}
+
+model AssessmentItem {
+  id Int @id @default(autoincrement())
+
+  name String
+
+  assessmentType AssessmentType
+
+  highesPossibleGrade Decimal @db.Decimal(6, 2)
+
+  gradingPeriodId Int
+  gradingPeriod   GradingPeriod @relation(fields: [gradingPeriodId], references: [id])
+
+  sectionSubjectId Int
+  sectionSubject   SectionSubject @relation(fields: [sectionSubjectId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentScores StudentAssessmentScore[]
+
+  @@unique([sectionSubjectId, gradingPeriodId, name])
+}
+
+model StudentAssessmentScore {
+  id Int @id @default(autoincrement())
+
+  assessmentItemId Int
+  assessmentItem   AssessmentItem @relation(fields: [assessmentItemId], references: [id])
+
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [id])
+
+  score Decimal @db.Decimal(6, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([assessmentItemId, studentId])
+}
+
+model QuarterlyGrade {
+  id Int @id @default(autoincrement())
+
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [id])
+
+  sectionSubjectId Int
+  sectionSubject   SectionSubject @relation(fields: [sectionSubjectId], references: [id])
+
+  gradingPeriodId Int
+  gradingPeriod   GradingPeriod @relation(fields: [gradingPeriodId], references: [id])
+
+  writtenWorks Decimal @db.Decimal(5, 2)
+
+  performanceTask Decimal @db.Decimal(5, 2)
+
+  quarterlyAssessment Decimal @db.Decimal(5, 2)
+
+  initialGrade Decimal @db.Decimal(5, 2)
+
+  transmutedGrade Decimal @db.Decimal(5, 2)
+
+  isSubmitted Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, sectionSubjectId, gradingPeriodId])
+}
+
+model AssessmentWeight {
+  id Int @id @default(autoincrement())
+
+  sectionSubjectId Int
+  sectionSubject   SectionSubject @relation(fields: [sectionSubjectId], references: [id])
+
+  gradingPeriodId Int
+  gradingPeriod   GradingPeriod @relation(fields: [gradingPeriodId], references: [id])
+
+  writtenWorkWeight Decimal @db.Decimal(5, 2)
+
+  performanceTaskWeight Decimal @db.Decimal(5, 2)
+
+  quarterlyAssessmentWeight Decimal @db.Decimal(5, 2)
+
+  @@unique([sectionSubjectId, gradingPeriodId])
 }
