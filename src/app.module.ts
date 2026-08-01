@@ -20,6 +20,7 @@ import { StudentsModule } from './students/students.module';
 import { EnrollmentApplicationModule } from './enrollment-application/enrollment-application.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { GradingPeriodsModule } from './grading-periods/grading-periods.module';
+import { AssessmentWeightModule } from './assessment-weight/assessment-weight.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { GradingPeriodsModule } from './grading-periods/grading-periods.module';
     EnrollmentApplicationModule,
     AttendanceModule,
     GradingPeriodsModule,
+    AssessmentWeightModule,
   ],
   controllers: [AppController, AuthController],
   providers: [AppService, EnrollmentsService, StudentsService],
