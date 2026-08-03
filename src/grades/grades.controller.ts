@@ -14,7 +14,7 @@ export class GradesController {
   }
 
   @Get('written-works/:sectionSubjectId/:gradingPeriodId/:studentId')
-  getWrittenWorks(
+  getWrittenWorksPercentage(
     @Param('sectionSubjectId', ParseIntPipe)
     sectionSubjectId: number,
 
@@ -25,6 +25,55 @@ export class GradesController {
     studentId: number,
   ) {
     return this.gradesService.getWrittenWorkPercentage(
+      sectionSubjectId,
+      gradingPeriodId,
+      studentId,
+    );
+  }
+
+  @Get('performance-tasks/:sectionSubjectId/:gradingPeriodId/:studentId')
+  getPerformanceTasksPercentage(
+    @Param('sectionSubjectId', ParseIntPipe)
+    sectionSubjectId: number,
+
+    @Param('gradingPeriodId', ParseIntPipe)
+    gradingPeriodId: number,
+
+    @Param('studentId', ParseIntPipe)
+    studentId: number,
+  ) {
+    return this.gradesService.getPerformanceTasksPercentage(
+      sectionSubjectId,
+      gradingPeriodId,
+      studentId,
+    );
+  }
+
+  @Get('quarterly-assessment/:sectionSubjectId/:gradingPeriodId/:studentId')
+  getQuarterlyAssessmentPercentage(
+    @Param('sectionSubjectId', ParseIntPipe)
+    sectionSubjectId: number,
+
+    @Param('gradingPeriodId', ParseIntPipe)
+    gradingPeriodId: number,
+
+    @Param('studentId', ParseIntPipe)
+    studentId: number,
+  ) {
+    return this.gradesService.getQuarterlyAssessmentPercentage(
+      sectionSubjectId,
+      gradingPeriodId,
+      studentId,
+    );
+  }
+
+  @Get('initial-grade/:sectionSubjectId/:gradingPeriodId/:studentId')
+  getInitialGrade(
+    @Param('sectionSubjectId', ParseIntPipe) sectionSubjectId: number,
+    @Param('gradingPeriodId', ParseIntPipe) gradingPeriodId: number,
+    @Param('studentId', ParseIntPipe) studentId: number,
+  ) {
+    return this.gradesService.getInitialGrades(
       sectionSubjectId,
       gradingPeriodId,
       studentId,
