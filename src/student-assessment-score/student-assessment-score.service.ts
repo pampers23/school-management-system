@@ -71,9 +71,11 @@ export class StudentAssessmentScoreService {
       throw new BadRequestException('Student is not enrolled in this section');
     }
 
-    if (dto.score > Number(assessmentItem.highestPossibleScore)) {
+    const highestPossibleScore = Number(assessmentItem.highestPossibleScore);
+
+    if (dto.score > highestPossibleScore) {
       throw new BadRequestException(
-        `Score cannot exceed the highest possible score of ${assessmentItem.highestPossibleScore}`,
+        `Score cannot exceed the highest possible score of ${highestPossibleScore}`,
       );
     }
 
