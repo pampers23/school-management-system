@@ -14,3 +14,9 @@ export type JwtPayload = {
   username: string;
   role: Role;
 };
+
+export type AssessmentBreakdownItem = {
+  assessment: string;
+  score: number;
+  highestPossibleScore: number;
+};

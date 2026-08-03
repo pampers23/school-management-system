@@ -23,6 +23,7 @@ import { GradingPeriodsModule } from './grading-periods/grading-periods.module';
 import { AssessmentWeightModule } from './assessment-weight/assessment-weight.module';
 import { AssessmentItemModule } from './assessment-item/assessment-item.module';
 import { StudentAssessmentScoreModule } from './student-assessment-score/student-assessment-score.module';
+import { GradesModule } from './grades/grades.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { StudentAssessmentScoreModule } from './student-assessment-score/student
     AssessmentWeightModule,
     AssessmentItemModule,
     StudentAssessmentScoreModule,
+    GradesModule,
   ],
   controllers: [AppController, AuthController],
   providers: [AppService, EnrollmentsService, StudentsService],
