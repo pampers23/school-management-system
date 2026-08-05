@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAssessmentScoreDto } from './dto/create-student-assessment-score.dto';
+import { UpdateStudentAssessmentScore } from './dto/update-student-assessment-score';
 
 @Injectable()
 export class StudentAssessmentScoreService {
@@ -100,6 +101,76 @@ export class StudentAssessmentScoreService {
         studentId: dto.studentId,
         score: dto.score,
       },
+      include: {
+        assessmentItem: {
+          include: {
+            gradingPeriod: true,
+            sectionSubject: {
+              include: {
+                subject: true,
+              },
+            },
+          },
+        },
+        student: true,
+      },
+    });
+  }
+
+  async updateAssessmentScore(
+    userId: number,
+    scoreId: number,
+    dto: UpdateStudentAssessmentScore,
+  ) {
+    const teacher = await this.prisma.teacher.findUnique({
+      where: { userId },
+    });
+
+    if (!teacher) {
+      throw new NotFoundException('Teacher profile not found.');
+    }
+
+    const assessmentscore = await this.prisma.studentAssessmentScore.findUnique(
+      {
+        where: { id: scoreId },
+        include: {
+          assessmentItem: {
+            include: {
+              sectionSubject: true,
+            },
+          },
+        },
+      },
+    );
+
+    if (!assessmentscore) {
+      throw new NotFoundException('Assessment score not found');
+    }
+
+    const assignment = await this.prisma.teacherAssignment.findFirst({
+      where: {
+        teacherId: teacher.id,
+        sectionSubjectId: assessmentscore.assessmentItem.sectionSubjectId,
+      },
+    });
+
+    if (!assignment) {
+      throw new ForbiddenException(
+        'You are not assigned to this section subject',
+      );
+    }
+
+    if (
+      dto.score > Number(assessmentscore.assessmentItem.highestPossibleScore)
+    ) {
+      throw new BadRequestException(
+        `Score cannot exceed the highest possible score of ${Number(assessmentscore.assessmentItem.highestPossibleScore)}`,
+      );
+    }
+
+    return this.prisma.studentAssessmentScore.update({
+      where: { id: scoreId },
+      data: { score: dto.score },
       include: {
         assessmentItem: {
           include: {

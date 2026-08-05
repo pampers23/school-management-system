@@ -7,6 +7,9 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
+  getWrittenWorksPercentage() {
+    throw new Error('Method not implemented.');
+  }
   constructor() {
     const adapter = new PrismaMariaDb(process.env.DATABASE_URL!);
     super({ adapter });

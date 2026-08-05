@@ -671,3 +671,15 @@ model AssessmentWeight {
 
   @@unique([sectionSubjectId, gradingPeriodId])
 }
+
+model GradeTransmutation {
+  id Int @id @default(autoincrement())
+
+  initialFrom Decimal @db.Decimal(5, 2)
+  initialTo Decimal @db.Decimal(5, 2)
+
+  transmutatedGrade Int
+
+  createAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
