@@ -5,6 +5,7 @@ import {
   Body,
   Patch,
   Param,
+  Delete,
   ParseIntPipe,
 } from '@nestjs/common';
 import { StudentAssessmentScoreService } from './student-assessment-score.service';
@@ -48,5 +49,15 @@ export class StudentAssessmentScoreController {
       id,
       dto,
     );
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.TEACHER)
+  deleteAssessmentScore(
+    @CurrentUser('id') userId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.studentAssessmentScoreService.deleteAssessmentScore(userId, id);
   }
 }

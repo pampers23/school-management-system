@@ -186,4 +186,48 @@ export class StudentAssessmentScoreService {
       },
     });
   }
+
+  async deleteAssessmentScore(userId: number, scoreId: number) {
+    const teacher = await this.prisma.teacher.findUnique({
+      where: { userId },
+    });
+
+    if (!teacher) {
+      throw new NotFoundException('Teacher profile not found');
+    }
+
+    const assessmentScore = await this.prisma.studentAssessmentScore.findUnique(
+      {
+        where: { id: scoreId },
+        include: {
+          assessmentItem: {
+            include: { sectionSubject: true },
+          },
+        },
+      },
+    );
+
+    if (!assessmentScore) {
+      throw new NotFoundException('Assessment score not found');
+    }
+
+    const assignment = await this.prisma.teacherAssignment.findFirst({
+      where: {
+        teacherId: teacher.id,
+        sectionSubjectId: assessmentScore.assessmentItem.sectionSubjectId,
+      },
+    });
+
+    if (!assignment) {
+      throw new ForbiddenException(
+        'You are not assigned to this section subject.',
+      );
+    }
+
+    await this.prisma.studentAssessmentScore.delete({
+      where: { id: scoreId },
+    });
+
+    return { message: 'Assessment score deleted successfully' };
+  }
 }

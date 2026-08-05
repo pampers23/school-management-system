@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAssessmentItemDto } from './dto/create-assessment-item.dto';
@@ -72,5 +73,53 @@ export class AssessmentItemService {
         gradingPeriod: true,
       },
     });
+  }
+
+  async deleteAssessmentItem(userId: number, assessmentItemId: number) {
+    const teacher = await this.prisma.teacher.findUnique({
+      where: { userId },
+    });
+
+    if (!teacher) {
+      throw new NotFoundException('Teacher profile not found');
+    }
+
+    const assessmentItem = await this.prisma.assessmentItem.findUnique({
+      where: { id: assessmentItemId },
+      include: { sectionSubject: true },
+    });
+
+    if (!assessmentItem) {
+      throw new NotFoundException('Assessment item not found.');
+    }
+
+    const assignment = await this.prisma.teacherAssignment.findFirst({
+      where: {
+        teacherId: teacher.id,
+        sectionSubjectId: assessmentItem.sectionSubjectId,
+      },
+    });
+
+    if (!assignment) {
+      throw new ForbiddenException(
+        'You are not assigned to this section subject',
+      );
+    }
+
+    const scoreCount = await this.prisma.studentAssessmentScore.count({
+      where: { assessmentItemId },
+    });
+
+    if (scoreCount > 0) {
+      throw new BadRequestException(
+        'Cannot delete assessment item because student scores already exisit.',
+      );
+    }
+
+    await this.prisma.assessmentItem.delete({
+      where: { id: assessmentItemId },
+    });
+
+    return { message: 'Assessment Item deleted successfully.' };
   }
 }
