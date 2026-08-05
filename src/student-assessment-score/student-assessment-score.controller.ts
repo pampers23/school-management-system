@@ -1,4 +1,12 @@
-import { Controller, Post, UseGuards, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UseGuards,
+  Body,
+  Patch,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { StudentAssessmentScoreService } from './student-assessment-score.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -6,6 +14,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../../generated/prisma/enums';
 import { CreateAssessmentScoreDto } from './dto/create-student-assessment-score.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { UpdateStudentAssessmentScore } from './dto/update-student-assessment-score';
 
 @Controller('student-assessment-score')
 export class StudentAssessmentScoreController {
@@ -22,6 +31,21 @@ export class StudentAssessmentScoreController {
   ) {
     return this.studentAssessmentScoreService.createAssessmentScore(
       userId,
+      dto,
+    );
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.TEACHER)
+  updateAssessmentScore(
+    @CurrentUser('id') userId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateStudentAssessmentScore,
+  ) {
+    return this.studentAssessmentScoreService.updateAssessmentScore(
+      userId,
+      id,
       dto,
     );
   }

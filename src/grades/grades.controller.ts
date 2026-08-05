@@ -79,4 +79,17 @@ export class GradesController {
       studentId,
     );
   }
+
+  @Get('transmuted-grade/:sectionSubjectId/:gradingPeriodId/:studentId')
+  getQuarterGrade(
+    @Param('sectionSubjectId', ParseIntPipe) sectionSubjectId: number,
+    @Param('gradingPeriodId', ParseIntPipe) gradingPeriodId: number,
+    @Param('studentId', ParseIntPipe) studentId: number,
+  ) {
+    return this.gradesService.getQuarterGrade(
+      sectionSubjectId,
+      gradingPeriodId,
+      studentId,
+    );
+  }
 }

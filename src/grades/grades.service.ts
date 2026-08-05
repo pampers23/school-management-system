@@ -304,7 +304,7 @@ export class GradesService {
       writtenWorkWeight,
       writtenWorkWeighted: Number(writtenWorkWeighted.toFixed(2)),
 
-      perfomanceTasksPercentage: perfomanceTasks.percentageScore,
+      performanceTasksPercentage: perfomanceTasks.percentageScore,
       performanceTaskWeight,
       performanceTaskWeighted: Number(performanceTaskWeighted.toFixed(2)),
 
@@ -315,6 +315,25 @@ export class GradesService {
       ),
 
       initialGrade: Number(initialGrade.toFixed(2)),
+    };
+  }
+
+  async getQuarterGrade(
+    sectionSubjectId: number,
+    gradingPeriodId: number,
+    studentId: number,
+  ) {
+    const initialGrade = await this.getInitialGrades(
+      sectionSubjectId,
+      gradingPeriodId,
+      studentId,
+    );
+
+    const quarterGrade = Math.round(initialGrade.initialGrade);
+
+    return {
+      ...initialGrade,
+      quarterGrade,
     };
   }
 }
