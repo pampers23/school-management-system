@@ -20,3 +20,31 @@ export type AssessmentBreakdownItem = {
   score: number;
   highestPossibleScore: number;
 };
+
+export type StudentImportRow = {
+  rows: number;
+  studentNumber: string;
+  name: string;
+  gender: 'MALE' | 'FEMALE';
+  quarterGrade: number;
+};
+
+export type UnmatchedStudentRow = StudentImportRow & {
+  reason: string;
+};
+
+export type MatchedStudentRow = StudentImportRow & {
+  studentId: number;
+};
+
+export type SavedGradeRow = {
+  studentId: number;
+  name: string;
+  quarterGrade: number;
+  gender: 'MALE' | 'FEMALE';
+  gradeId: number;
+};
+
+export type FailedGradeRow = StudentImportRow & {
+  reason: string;
+};
