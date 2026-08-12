@@ -190,6 +190,12 @@ model Student {
   studentAssessmentScores StudentAssessmentScore[]
 
   quarterlyGrades QuarterlyGrade[]
+
+  studentQuarterGrades StudentQuarterGrade[]
+
+  studentFinalGrades StudentFinalGrade[]
+
+  grades Grade[]
 }
 
 model EnrollmentApplication {
@@ -273,6 +279,8 @@ model SchoolYear {
   gradingPeriods        GradingPeriod[]
 
   @@unique([startYear, endYear])
+  studentQuarterGrades StudentQuarterGrade[]
+  studentFinalGrades StudentFinalGrade[]
 }
 
 model EnrollmentApplicationAddress {
@@ -342,6 +350,10 @@ model Subject {
 
   curriculumSubjects CurriculumSubject[]
   sectionSubjects    SectionSubject[]
+
+  studentQuarterGrades StudentQuarterGrade[]
+
+  studentFinalGrades StudentFinalGrade[]
 }
 
 model Curriculum {
@@ -463,6 +475,7 @@ model SectionSubject {
   assessmentWeights  AssessmentWeight[]
 
   @@unique([sectionId, subjectId])
+  grades Grade[]
 }
 
 model TeacherAssignment {
@@ -582,6 +595,8 @@ model GradingPeriod {
   assessmentWeights AssessmentWeight[]
 
   @@unique([schoolYearId, quarter])
+  studentQuarterGrades StudentQuarterGrade[]
+  grades Grade[]
 }
 
 model AssessmentItem {
@@ -682,4 +697,67 @@ model GradeTransmutation {
 
   createAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+model StudentQuarterGrade {
+  id Int @id @default(autoincrement())
+
+  studentId Int
+  student Student @relation(fields: [studentId], references: [id])
+
+  subjectId Int
+  subject Subject @relation(fields: [subjectId], references: [id])
+
+  schoolYearId Int
+  schoolYear SchoolYear @relation(fields: [schoolYearId], references: [id])
+
+  gradingPeriodId Int
+  gradingPeriod GradingPeriod @relation(fields: [gradingPeriodId], references: [id])
+
+  quarterGrade Decimal @db.Decimal(5, 2)
+
+  importedAt DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, subjectId, schoolYearId, gradingPeriodId])
+}
+
+model StudentFinalGrade {
+  id Int @id @default(autoincrement())
+
+  studentId Int
+  student Student @relation(fields: [studentId], references: [id])
+
+  subjectId Int
+  subject Subject @relation(fields: [subjectId], references: [id])
+
+  schoolYearId Int
+  schoolYear SchoolYear @relation(fields: [schoolYearId], references: [id])
+
+  finalGrade Decimal @db.Decimal(5, 2)
+
+  remarks String
+
+  importedAt DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, subjectId, schoolYearId])
+}
+
+model Grade {
+  id Int @id @default(autoincrement())
+
+  studentId Int
+  sectionSubjectId Int
+  gradingPeriodId Int
+  quarterGrade Decimal @db.Decimal(5, 2)
+
+  student Student @relation(fields: [studentId], references: [id])
+  sectionSubject SectionSubject @relation(fields: [sectionSubjectId], references: [id])
+  gradingPeriod GradingPeriod @relation(fields: [gradingPeriodId], references: [id])
+
+  @@unique([studentId, sectionSubjectId, gradingPeriodId])
 }
