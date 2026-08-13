@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CurriculumService } from './curriculum.service';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 
 describe('CurriculumService', () => {
   let service: CurriculumService;

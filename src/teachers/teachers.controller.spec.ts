@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TeachersController } from './teachers.controller';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 
 describe('TeachersController', () => {
   let controller: TeachersController;

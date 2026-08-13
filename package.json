@@ -53,6 +53,7 @@
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
+    "@types/mocha": "^10.0.10",
     "@types/multer": "^2.2.0",
     "@types/node": "^24.13.3",
     "@types/passport-jwt": "^4.0.1",
@@ -90,6 +91,9 @@
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s"
+    ],
+    "setupFiles": [
+      "dotenv/config"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"

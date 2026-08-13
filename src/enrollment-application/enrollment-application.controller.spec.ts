@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EnrollmentApplicationController } from './enrollment-application.controller';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 
 describe('EnrollmentApplicationController', () => {
   let controller: EnrollmentApplicationController;
@@ -9,7 +10,9 @@ describe('EnrollmentApplicationController', () => {
       controllers: [EnrollmentApplicationController],
     }).compile();
 
-    controller = module.get<EnrollmentApplicationController>(EnrollmentApplicationController);
+    controller = module.get<EnrollmentApplicationController>(
+      EnrollmentApplicationController,
+    );
   });
 
   it('should be defined', () => {

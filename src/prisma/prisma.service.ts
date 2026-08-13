@@ -7,12 +7,20 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
+  constructor() {
+    const dbUrl = new URL(process.env.DATABASE_URL!);
+    const adapter = new PrismaMariaDb({
+      host: dbUrl.hostname,
+      port: dbUrl.port ? parseInt(dbUrl.port, 10) : 3306,
+      user: dbUrl.username,
+      password: dbUrl.password,
+      database: dbUrl.pathname.slice(1), // strip leading "/"
+    });
+    super({ adapter });
+  }
+
   getWrittenWorksPercentage() {
     throw new Error('Method not implemented.');
-  }
-  constructor() {
-    const adapter = new PrismaMariaDb(process.env.DATABASE_URL!);
-    super({ adapter });
   }
 
   async onModuleInit() {

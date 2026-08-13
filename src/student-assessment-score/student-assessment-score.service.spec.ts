@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StudentAssessmentScoreService } from './student-assessment-score.service';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 
 describe('StudentAssessmentScoreService', () => {
   let service: StudentAssessmentScoreService;
@@ -9,7 +10,9 @@ describe('StudentAssessmentScoreService', () => {
       providers: [StudentAssessmentScoreService],
     }).compile();
 
-    service = module.get<StudentAssessmentScoreService>(StudentAssessmentScoreService);
+    service = module.get<StudentAssessmentScoreService>(
+      StudentAssessmentScoreService,
+    );
   });
 
   it('should be defined', () => {
