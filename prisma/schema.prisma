@@ -115,6 +115,11 @@ enum AssessmentType {
   QUARTERLY_ASSESSMENT
 }
 
+enum AnnouncementAudience {
+  ALL
+  SECTION
+}
+
 model User {
   id                 Int     @id @default(autoincrement())
   username           String  @unique
@@ -131,6 +136,8 @@ model User {
   updatedAt DateTime @updatedAt
 
   enrollmentApplicationReviews EnrollmentApplicationReview[]
+
+  announcements Announcement[]
 }
 
 model Teacher {
@@ -416,6 +423,7 @@ model Section {
   updatedAt DateTime @updatedAt
 
   @@unique([name, curriculumId])
+  announcements Announcement[]
 }
 
 model Enrollment {
@@ -760,4 +768,27 @@ model Grade {
   gradingPeriod GradingPeriod @relation(fields: [gradingPeriodId], references: [id])
 
   @@unique([studentId, sectionSubjectId, gradingPeriodId])
+}
+
+model Announcement {
+  id Int @id @default(autoincrement())
+
+  title String
+  content String
+  
+  audience AnnouncementAudience @default(ALL)
+
+  sectionId Int?
+  section Section? @relation(fields: [sectionId], references: [id])
+
+  createdByUserId Int
+  createdByUser User @relation(fields: [createdByUserId], references: [id])
+
+  isPublished Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sectionId])
+  @@index([createdByUserId])
 }

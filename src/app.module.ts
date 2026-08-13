@@ -25,6 +25,7 @@ import { AssessmentItemModule } from './assessment-item/assessment-item.module';
 import { StudentAssessmentScoreModule } from './student-assessment-score/student-assessment-score.module';
 import { GradesModule } from './grades/grades.module';
 import { ExcelModule } from './excel/excel.module';
+import { AnnouncementModule } from './announcement/announcement.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { ExcelModule } from './excel/excel.module';
     StudentAssessmentScoreModule,
     GradesModule,
     ExcelModule,
+    AnnouncementModule,
   ],
   controllers: [AppController, AuthController],
   providers: [AppService, EnrollmentsService, StudentsService],
