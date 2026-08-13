@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TeacherAssignmentController } from './teacher-assignment.controller';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 
 describe('TeacherAssignmentController', () => {
   let controller: TeacherAssignmentController;
@@ -9,7 +10,9 @@ describe('TeacherAssignmentController', () => {
       controllers: [TeacherAssignmentController],
     }).compile();
 
-    controller = module.get<TeacherAssignmentController>(TeacherAssignmentController);
+    controller = module.get<TeacherAssignmentController>(
+      TeacherAssignmentController,
+    );
   });
 
   it('should be defined', () => {

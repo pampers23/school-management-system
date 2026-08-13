@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EnrollmentApplicationService } from './enrollment-application.service';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 
 describe('EnrollmentApplicationService', () => {
   let service: EnrollmentApplicationService;
@@ -9,7 +10,9 @@ describe('EnrollmentApplicationService', () => {
       providers: [EnrollmentApplicationService],
     }).compile();
 
-    service = module.get<EnrollmentApplicationService>(EnrollmentApplicationService);
+    service = module.get<EnrollmentApplicationService>(
+      EnrollmentApplicationService,
+    );
   });
 
   it('should be defined', () => {
