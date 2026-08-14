@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RoomController } from './room.controller';
-import { beforeEach, describe, expect, it } from '@jest/globals';
+import { RoomService } from './room.service';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 
 describe('RoomController', () => {
   let controller: RoomController;
@@ -8,6 +9,17 @@ describe('RoomController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [RoomController],
+      providers: [
+        {
+          provide: RoomService,
+          useValue: {
+            create: jest.fn(),
+            findAll: jest.fn(),
+            findOne: jest.fn(),
+            remove: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     controller = module.get<RoomController>(RoomController);

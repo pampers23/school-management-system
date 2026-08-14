@@ -14,7 +14,7 @@ export class PrismaService
       port: dbUrl.port ? parseInt(dbUrl.port, 10) : 3306,
       user: dbUrl.username,
       password: dbUrl.password,
-      database: dbUrl.pathname.slice(1), // strip leading "/"
+      database: dbUrl.pathname.slice(1),
     });
     super({ adapter });
   }
