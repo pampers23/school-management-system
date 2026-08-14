@@ -1,19 +1,30 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { AssessmentWeightController } from './assessment-weight.controller';
 import { AssessmentWeightService } from './assessment-weight.service';
-import { beforeEach, describe, expect, it } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 
-describe('AssessmentWeightService', () => {
-  let service: AssessmentWeightService;
+describe('AssessmentWeightController', () => {
+  let controller: AssessmentWeightController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AssessmentWeightService],
+      controllers: [AssessmentWeightController],
+      providers: [
+        {
+          provide: AssessmentWeightService,
+          useValue: {
+            createAssessmentWeight: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
-    service = module.get<AssessmentWeightService>(AssessmentWeightService);
+    controller = module.get<AssessmentWeightController>(
+      AssessmentWeightController,
+    );
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(controller).toBeDefined();
   });
 });
